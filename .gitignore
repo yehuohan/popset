@@ -1,0 +1,14 @@
+
+#===============================================================================
+# .gitignogre for popset
+
+*.swp
+
+/*
+!/.gitignore
+!/*.md
+!/*.png
+!/LICENSE
+!/autoload
+!/doc
+!/plugin
