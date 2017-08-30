@@ -53,19 +53,20 @@ function! popset#selection#Content()
     let l:maxkeywid = 0
 
     " get max key text width
-    for t in s:selection_lst
-        let l:keywid = strwidth(t)
+    for lst in s:selection_lst
+        let l:keywid = strwidth(lst)
         let l:maxkeywid = (l:keywid > l:maxkeywid) ? l:keywid : l:maxkeywid
     endfor
     " add 3 space width to maxkeywid
     let l:maxkeywid += 3
 
     " create and tabular buffer text
-    for t in s:selection_lst
-        let l:linetext = "   " . t
-        if has_key(s:selection_dic, t)
+    for lst in s:selection_lst
+        let l:linetext = "   " . lst
+        if has_key(s:selection_dic, lst)
+            " add description of selection if it exits
             let l:linetext .= repeat(' ', l:maxkeywid - strwidth(l:linetext)) . " : "
-            let l:linetext .= s:selection_dic[t]
+            let l:linetext .= s:selection_dic[lst]
         endif
         let l:linetext .= repeat(' ', l:winwid - strwidth(l:linetext) + 1)
         let l:text .= l:linetext . "\n"

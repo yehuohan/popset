@@ -39,8 +39,8 @@ In popset view, you can use following command:
 q       : Quit pop selection
 j       : Move the selection bar down
 k       : Move the selection bar up
-<C-j>   : Move the selection bar one screen up
-<C-k>   : Move the selection bar one screen down
+<C-j>   : Move the selection bar one screen down
+<C-k>   : Move the selection bar one screen up
 <CR>    : Load the selection
 <Space> : Previous the selection
 ?       : Show Help

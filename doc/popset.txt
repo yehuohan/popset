@@ -101,8 +101,8 @@ In popset view, you can use following default command: >
     q       : Quit pop selection
     j       : Move the selection bar down
     k       : Move the selection bar up
-    <C-j>   : Move the selection bar one screen up
-    <C-k>   : Move the selection bar one screen down
+    <C-j>   : Move the selection bar one screen down
+    <C-k>   : Move the selection bar one screen up
     <CR>    : Load the selection
     <Space> : Previous the selection
     ?       : Show Help
@@ -199,7 +199,7 @@ Default vaule: >
 --------------------------------------------------------------------------------
  4.6 g:Popset_KeyMoveCursorPgDown                 *g:Popset_KeyMoveCursorPgDown*
 
-Setting the keys to Move the selection bar one screen up.
+Setting the keys to Move the selection bar one screen down. 
 
 Default vaule: >
 
@@ -210,7 +210,7 @@ Default vaule: >
 --------------------------------------------------------------------------------
  4.7 g:Popset_KeyMoveCursorPgUp                     *g:Popset_KeyMoveCursorPgUp*
 
-Setting the keys to Move the selection bar one screen down.
+Setting the keys to Move the selection bar one screen up. 
 
 Default vaule: >
 
