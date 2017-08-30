@@ -8,7 +8,7 @@ function! popset#init#Init()
     if s:config.CompleteAll
         command! -nargs=+ -complete=option PSet :call popset#selection#SetOption(<f-args>)
     else
-        command! -nargs=+ -complete=customlist,popset#data#GetOptionList PSet :call popset#selection#SetOption(<f-args>)
+        command! -nargs=+ -complete=customlist,popset#data#GetCompleteOptionList PSet :call popset#selection#SetOption(<f-args>)
     endif
 
     " highlight for popset

@@ -1,8 +1,13 @@
 
 " SECTION: variables {{{1
+
+" what option to set
 let s:selection_opt = ""
+" what selections to choose for option
 let s:selection_lst = []
+" what information to show for selections
 let s:selection_dic = {}
+" what command to execute for selected selection
 let s:selection_cmd = ""
 
 

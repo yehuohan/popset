@@ -1,6 +1,11 @@
 
 # ChangeLog 
 
+## 20170831 - v0.1.8
+ - add some option surpported by popset
+ - add ':PSet popset' option to show all surpported option by popset
+ - append user's option to popset but not override existed option
+
 ## 20170830 - v0.1.5
  - implement showing help text with user's settings
 
