@@ -18,10 +18,10 @@ let s:help_text = [
 function! popset#help#HelpText()
     let l:size = len(s:help_text)
     let l:text = ""
-    let l:wid = &columns
+    let l:winwid = &columns
     for t in s:help_text
         let l:linetext = "   " . t
-        let l:linetext .= repeat(' ', l:wid - strwidth(l:linetext) + 1)
+        let l:linetext .= repeat(' ', l:winwid - strwidth(l:linetext) + 1)
         let l:text .= l:linetext . "\n"
     endfor
     return [l:text, l:size]

@@ -2,6 +2,7 @@
 " SECTION: functions {{{1
 let s:config = popset#config#Configuration()
 
+
 " FUNCTION: popset#init#Init() {{{
 function! popset#init#Init()
     if s:config.CompleteAll

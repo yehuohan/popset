@@ -1,50 +1,29 @@
 
-**PopSet** is just a vim plugin for popping selections of vim option, which will be convinient for setting vim options.
+**Popset** is a vim plugin to `Pop selections for vim option settings`, which will be convinient for setting vim options.
 
 **Popset** is inspired bySzymon Wrozynski plugin [vim-CtrlSpapce](https://github.com/vim-ctrlspace/vim-ctrlspace) and some plugin code of popset is based on vim-ctrlspace and Thanks a lot.
 
----
 
+---
 ## Installation
 
 For vim-plug, add to your `.vimrc`:
 
-```VimL
+```vim
 Plug 'yehuohan/popset'
 ```
 
+---
 ## Settings
 
  - Please set `nocompatible` and `hidden` options:
 
-```VimL
+```vim
 set nocompatible
 set hidden
 ```
 
- - Adjust plugin colors by the following code:
-
-```VimL
-hi link PopsetNormal   PMenu
-hi link PopsetSelected PMenuSel
-```
-
- - Add your own selections by adding the following example-code to `.vimrc`:
-
-```VimL
-    let g:Popset_SelectionData = [
-        \{
-            \ "opt" : ["filetype", "ft"],
-            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
-            \ "cmd" : "g:SetEqual",
-        \},
-        \]
-    function! g:SetEqual(sopt, arg)
-        execute "set " . a:sopt . "=" . a:arg
-    endfunction
-```
-
-
+---
 ## Usage
 
 There is only one command `PSet`, which is similar to `set` command, in popset.
@@ -67,17 +46,35 @@ k       : Move the selection bar up
 ?       : Show Help
 ```
 
- - Set Compeltion of `PSet` by `g:Popset_CompleteAll`:
+ - Set Completion of `PSet` by `g:Popset_CompleteAll`:
 
-```VimL
+```vim
 let g:Popset_CompleteAll = 1    " auto complete all command of vim
 let g:Popset_CompleteAll = 0    " auto complete commands surpported by popset
 ```
 
+ - Add your own selections by adding the following example code to `.vimrc`:
 
-## Contributor
- - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
+```vim
+    let g:Popset_SelectionData = [
+        \{
+            \ "opt" : ["filetype", "ft"],
+            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
+            \ "dic" : {
+                    \ "python" : "python script file",
+                    \ "vim": "Vim script file",
+                    \ },
+            \ "cmd" : "g:SetEqual",
+        \},
+        \]
+    function! g:SetEqual(sopt, arg)
+        execute "set " . a:sopt . "=" . a:arg
+    endfunction
+```
+
+The key `opt` is the option name list to add, `lst` is the selections of the `opt`, `dic` is simple description of `lst` and `dic` can be empty, and `cmd` is the function that must execute with `opt` and `lst` args. In the example code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` for `lst`.
+
 
 ---
-## TODO
- - write doc
+## Contributor
+ - yehuohan, yehuohan@qq.com, yehuohan@gmail.com

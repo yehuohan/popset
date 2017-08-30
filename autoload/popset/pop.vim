@@ -1,23 +1,24 @@
 
 
 " SECTION: variables {{{1
+let s:config = popset#config#Configuration()
 let b:text = ""
 let b:size = -1
-let s:is_htext = 0
+let s:is_helptext = 0
 
 
 " SETCION: functions {{{1
 
 " FUNCTION: popset#pop#InitPopKeys() {{{
 function! popset#pop#InitPopKeys()
-    call popset#key#AddMaps("popset#pop#Quit"             , ["q"])
-    call popset#key#AddMaps("popset#pop#MoveCursor"       , ["j"]      , "down")
-    call popset#key#AddMaps("popset#pop#MoveCursor"       , ["k"]      , "up")
-    call popset#key#AddMaps("popset#pop#MoveCursor"       , ["C-j"]    , "pgdown")
-    call popset#key#AddMaps("popset#pop#MoveCursor"       , ["C-k"]    , "pgup")
-    call popset#key#AddMaps("popset#pop#ApplySelection"   , ["CR"])
-    call popset#key#AddMaps("popset#pop#PreviewSelection" , ["Space"])
-    call popset#key#AddMaps("popset#pop#ShowHelp"         , ["?"])
+    call popset#key#AddMaps("popset#pop#Quit"             , s:config["KeyQuit"])
+    call popset#key#AddMaps("popset#pop#MoveCursor"       , s:config["KeyMoveCursorDown"]    , "down")
+    call popset#key#AddMaps("popset#pop#MoveCursor"       , s:config["KeyMoveCursorUp"]      , "up")
+    call popset#key#AddMaps("popset#pop#MoveCursor"       , s:config["KeyMoveCursorPgDown"]  , "pgdown")
+    call popset#key#AddMaps("popset#pop#MoveCursor"       , s:config["KeyMoveCursorPgUp"]    , "pgup")
+    call popset#key#AddMaps("popset#pop#ApplySelection"   , s:config["KeyApplySelection"])
+    call popset#key#AddMaps("popset#pop#PreviewSelection" , s:config["KeyPreviewSelection"])
+    call popset#key#AddMaps("popset#pop#ShowHelp"         , s:config["KeyShowHelp"])
 endfunction
 " }}}
 
@@ -102,7 +103,7 @@ endfunction
 
 " FUNCTION: popset#pop#ApplySelection() {{{
 function! popset#pop#ApplySelection()
-    if s:is_htext == 1
+    if s:is_helptext == 1
         return 
     endif
     let l:opt = popset#selection#SelectionOption()
@@ -115,7 +116,7 @@ endfunction
 
 " FUNCTION: popset#pop#PreviewSelection() {{{
 function! popset#pop#PreviewSelection()
-    if s:is_htext == 1
+    if s:is_helptext == 1
         return 
     endif
     let s:last_line = line(".")
@@ -132,8 +133,8 @@ endfunction
 
 " FUNCTION: popset#pop#Quit() {{{
 function! popset#pop#Quit()
-    if s:is_htext == 1
-        let s:is_htext = 0
+    if s:is_helptext == 1
+        let s:is_helptext = 0
         let [b:text, b:size] = popset#selection#Content()
         call s:displayContent()
     else
@@ -207,10 +208,10 @@ endfunction
 
 " FUNCTION: popset#pop#ShowHelp() {{{
 function! popset#pop#ShowHelp()
-    if s:is_htext == 1
+    if s:is_helptext == 1
         return 
     endif
-    let s:is_htext = 1
+    let s:is_helptext = 1
     let [b:text, b:size] = popset#help#HelpText()
     call s:displayContent()
 endfunction

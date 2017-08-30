@@ -1,17 +1,282 @@
-*popset.txt*
+*popset.txt* Pop selections for vim option settings.
 *popset*
 
                                    PopSet 
 
-
 ================================================================================
-
 Table of Contents                                                   *popset-toc*
 
 1. Overview                                                    |popset-overview|
+2. Usage                                                          |popset-usage|
+ 2.1 Installation                                          |popset-installation|
+ 2.2 Options Setting for popset                         |popset-options-setting|
+ 2.3 Colors Setting                                              |popset-colors|
+3. Command                                                      |popset-command|
+ 3.1 PSet                                                                |:PSet|
+4. Configuration                                          |popset-configuration|
+ 4.1 g:Popset_SelectionData                             |g:Popset_SelectionData|
+ 4.2 g:Popset_CompleteAll                                 |g:Popset_CompleteAll|
+ 4.3 g:Popset_KeyQuit                                         |g:Popset_KeyQuit|
+ 4.4 g:Popset_KeyMoveCursorDown                     |g:Popset_KeyMoveCursorDown|
+ 4.5 g:Popset_KeyMoveCursorUp                         |g:Popset_KeyMoveCursorUp|
+ 4.6 g:Popset_KeyMoveCursorPgDown                 |g:Popset_KeyMoveCursorPgDown|
+ 4.7 g:Popset_KeyMoveCursorPgUp                     |g:Popset_KeyMoveCursorPgUp|
+ 4.8 g:Popset_KeyApplySelection                     |g:Popset_KeyApplySelection|
+ 4.9 g:Popset_KeyPreviewSelection                 |g:Popset_KeyPreviewSelection|
+ 4.10 g:Popset_KeyShowHelp                                |g:Popset_KeyShowHelp|
+5. License                                                      |popset-license|
 
 
 ================================================================================
-1. Overview                                                    |popset-overview|
+1. Overview                                                    *popset-overview*
+
+Popset is a vim plugin to Pop selections for vim option settings, which will be 
+convinient for setting vim options.
+Popset is inspired bySzymon Wrozynski plugin vim-CtrlSpapce and some plugin code
+ of popset is based on vim-ctrlspace and Thanks a lot.
+
+                                                                    |popset-toc|
+
+================================================================================
+2. Usage                                                          *popset-usage*
+
+The easiest way is using a plugin like vundle or vim-plug to install popset and
+use command :PSet to set vim options.
+You can also map keys you prefered to the command :Pset.
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 2.1 Installation                                          *popset-installation*
+
+For a example of vim-plug, add following code to .vimrc: >
+
+    Plug 'yehuohan/popset'
+>
+
+and call command PlugInstall.
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 2.2 Options Setting for popset                         |popset-options-setting|
+
+Please set nocompatible and hidden options, which is required by popset: >
+
+    set nocompatible
+    set hidden
+>
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 2.3 Colors Setting                                              *popset-colors*
+
+You can adjust plugin colors by changing PopsetNormal and PopsetSelected, the
+default vaule is: >
+
+    hi link PopsetNormal   PMenu
+    hi link PopsetSelected PMenuSel
+>
+PopsetNormal is menu-selections color and PopsetSelected is menu-cursor color.
+
+                                                                    |popset-toc|
+
+================================================================================
+3. Command                                                      *popset-command*
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 3.1 PSet                                                                *:PSet*
+
+There is only one command PSet, which is similar to set command of vim, in 
+popset.  For example: >
+
+    :PSet foldmethod
+>
+
+In popset view, you can use following default command: >
+
+    q       : Quit pop selection
+    j       : Move the selection bar down
+    k       : Move the selection bar up
+    <C-j>   : Move the selection bar one screen up
+    <C-k>   : Move the selection bar one screen down
+    <CR>    : Load the selection
+    <Space> : Previous the selection
+    ?       : Show Help
+>
+
+                                                                    |popset-toc|
+
+================================================================================
+4. Configuration                                          *popset-configuration*
+
+There some option in popset you can change to make popset more convinient for 
+you.
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.1 g:Popset_SelectionData                             *g:Popset_SelectionData*
+
+This option can help you to add your own selections to popset. Following is the 
+example code in .vimrc: >
+
+    let g:Popset_SelectionData = [
+        \{
+            \ "opt" : ["filetype", "ft"],
+            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
+            \ "dic" : {
+                    \ "python" : "python script file",
+                    \ "vim": "Vim script file",
+                    \ },
+            \ "cmd" : "g:SetEqual",
+        \},
+        \]
+    function! g:SetEqual(sopt, arg)
+        execute "set " . a:sopt . "=" . a:arg
+    endfunction
+>
+
+The key `opt` is the option name list to add, `lst` is the selections of the 
+`opt`, `dic` is simple description of `lst` and `dic` can be empty, and `cmd` 
+is the function that must execute with `opt` and `lst` args. In the example 
+code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you 
+choose the selenction `cpp` for `lst`.
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.2 g:Popset_CompleteAll                                 *g:Popset_CompleteAll*
+
+This is used to set auto completion of PSet. Set this to 1 means that setting
+PSet auto completion list to all command of vim, and 0 means that setting PSet
+auto completion list to all command surpported by popset.
+
+Default vaule: >
+
+    let g:Popset_CompleteAll = 0
+>
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.3 g:Popset_KeyQuit                                         *g:Popset_KeyQuit*
+
+Setting the keys to Quit pop selection.
+
+Default vaule: >
+
+    let g:Popset_KeyQuit = ["q", "Esc"]
+>
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.4 g:Popset_KeyMoveCursorDown                     *g:Popset_KeyMoveCursorDown*
+
+Setting the keys to Move the selection bar down.
+
+Default vaule: >
+
+    let g:Popset_KeyMoveCursorDown = ["j"]
+>
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.5 g:Popset_KeyMoveCursorUp                         *g:Popset_KeyMoveCursorUp*
+
+Setting the keys to Move the selection bar up.
+
+Default vaule: >
+
+    let g:Popset_KeyMoveCursorUp = ["k"]
+>
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.6 g:Popset_KeyMoveCursorPgDown                 *g:Popset_KeyMoveCursorPgDown*
+
+Setting the keys to Move the selection bar one screen up.
+
+Default vaule: >
+
+    let g:Popset_KeyMoveCursorPgDown = ["C-j"]
+>
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.7 g:Popset_KeyMoveCursorPgUp                     *g:Popset_KeyMoveCursorPgUp*
+
+Setting the keys to Move the selection bar one screen down.
+
+Default vaule: >
+
+    let g:Popset_KeyMoveCursorPgUp = ["C-k"]
+>
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.8 g:Popset_KeyApplySelection                     *g:Popset_KeyApplySelection*
+
+Setting the keys to Load the selection.
+
+Default vaule: >
+
+    let g:Popset_KeyApplySelection = ["CR"]
+>
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.9 g:Popset_KeyPreviewSelection                 *g:Popset_KeyPreviewSelection*
+
+Setting the keys to Previous the selection.
+
+Default vaule: >
+
+    let g:Popset_KeyPreviewSelection = ["Space"]
+>
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.10 g:Popset_KeyShowHelp                                 *g:Popset_KeyShowHelp*
+
+Setting the keys to Show Help.
+
+Default vaule: >
+
+    let g:Popset_KeyShowHelp = ["?"]
+>
+                                                                    |popset-toc|
+
+================================================================================
+5. License                                                      |popset-license|
+
+MIT License
+
+Copyright (c) 2017 yehuohan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+                                                                    |popset-toc|
+
 
 

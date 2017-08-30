@@ -5,7 +5,6 @@ let s:key_names      = []
 let s:key_maps       = {}
 
 
-
 " SECTION: functions {{{1
 
 " FUNCTION: popset#key#KeyNames() {{{ return s:key_names
@@ -29,6 +28,7 @@ endfunction
 " }}}
 
 " FUNCTION: popset#key#AddMaps(funcName, keys) {{{2
+" map funcName to keys and call funcName with args(...)
 function! popset#key#AddMaps(funcName, keys, ...)
     let l:arg = []
     for a in a:000
@@ -41,6 +41,7 @@ endfunction
 " }}}
 
 " FUNCTION: s:initKeyMap() {{{
+" init maps with Undefined function
 function! s:initKeyMaps()
     for k in s:key_names
         let l:key = k == '"' ? '\"' : k
@@ -71,7 +72,7 @@ function! s:initKeyNames()
 
     let numbers  = "1 2 3 4 5 6 7 8 9 0"
     let specials = "Space CR BS Tab S-Tab / ? ; : , . < > [ ] { } ( ) ' ` ~ + - _ = ! @ # $ % ^ & * C-f C-b C-u C-d C-h C-w " .
-                \ "Bar BSlash MouseDown MouseUp LeftDrag LeftRelease 2-LeftMouse " .
+                \ "Bar BSlash MouseDown MouseUp LeftDrag LeftRelease 2-LeftMouse Esc " .
                 \ "Down Up Home End Left Right PageUp PageDown " .
                 \ 'F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 "'
 

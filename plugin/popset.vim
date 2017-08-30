@@ -1,4 +1,4 @@
-" Popset
+" Popset: Pop selections for vim option settings.
 " Maintainer: yehuohan
 " Version: 
 "
