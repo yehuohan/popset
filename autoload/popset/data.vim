@@ -66,7 +66,7 @@ function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
     " search fitable args
     for key in keys(s:popset_data)
         if key =~ "^".a:arglead
-            let l:completekeys = add(l:completekeys, key)
+            call add(l:completekeys, key)
         endif
     endfor
 
@@ -77,28 +77,66 @@ endfunction
 " FUNCTION: popset#data#GetSurpportedOptionList() {{{
 " get all options surpported by popset
 function! popset#data#GetSurpportedOptionList()
-    " get internal option list
     let l:lst = []
-    for item in range(1, len(s:popset_selection_data)-1)
-        call extend(l:lst, s:popset_selection_data[item]["opt"])
+    let l:lst_final = []
+    let l:dic_final = {}
+
+    " get internal option list
+    for item in s:popset_selection_data[1:-1]
+        call extend(l:lst, item["opt"])
+
+        " append the fisrt item of opt-list to selection list of popset option 
+        call add(l:lst_final, item["opt"][0])
+
+        " append the reset item of opt-list as description dictory
+        if len(item["opt"]) > 1
+            let l:dic_final[item["opt"][0]] = 
+                \ "Also equals to '" . join(item["opt"][1:-1], "','") . "'"
+        endif
     endfor
 
     " convert internal option list to string for search with matchstr
     "let l:lst_string = '|' . join(l:lst, '|') . '|'
 
     if exists("g:Popset_SelectionData")
-        " add no-reduplicated user's option to list
+        " add the non-reduplicated user's option to list
         for item in g:Popset_SelectionData
+            " detect whether user's option in 'item' is reduplicated
+            let l:flg = 0
+            let l:dsr = []
+            let l:key = ""
             for str in item["opt"]
                 " if internal list had not include user's option yet
-                if -1 == match(l:lst, '^' . str . '$')
                 "if "" == matchstr(l:lst_string, '|' . str . '|')
-                    let l:lst = add(l:lst, str)
+                if -1 == match(l:lst, '^' . str . '$')
+                    " note the non-reduplicated option
+                    call add(l:dsr, str)
+                else
+                    " note the reduplicate option
+                    let l:flg = 1
+                    if -1 != match(l:lst_final, '^' . str . '$')
+                        let l:key = str
+                    endif
                 endif
             endfor
+
+            if 0 == l:flg
+                " no reduplicated option in 'item' compared to internal option
+                call add(l:lst_final, item["opt"][0])
+                if len(item["opt"]) > 1
+                    let l:dic_final[item["opt"][0]] = 
+                        \ "Also equals to '" . join(item["opt"][1:-1], "','") . "'"
+                endif
+            else
+                " the option 'item' is reduplicated
+                if !empty(l:dsr) && l:key != ""
+                    let l:dic_final[l:key] .= ",'" . join(l:dsr, "','") . "'"
+                endif
+            endif
         endfor
     endif
-    let s:popset_selection_data[0]["lst"] = l:lst
+    let s:popset_selection_data[0]["lst"] = l:lst_final
+    let s:popset_selection_data[0]["dic"] = l:dic_final
 endfunction
 " }}}
 
@@ -134,7 +172,7 @@ function! s:getColorSchemeList()
     endif
 
     for item in l:scheme_path
-        let l:scheme_list = add(l:scheme_list, split(split(item, l:sep)[-1], '\.')[0])
+        call add(l:scheme_list, split(split(item, l:sep)[-1], '\.')[0])
     endfor
     return l:scheme_list
 endfunction

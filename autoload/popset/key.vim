@@ -32,7 +32,7 @@ endfunction
 function! popset#key#AddMaps(funcName, keys, ...)
     let l:arg = []
     for a in a:000
-        let l:arg = add(l:arg, '"' . a . '"')
+        call add(l:arg, '"' . a . '"')
     endfor
     for k in a:keys
         let s:key_maps[k] = a:funcName . "(" . join(l:arg, ",") . ")"

@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170901 - v0.2.9
+ - perfect lst and dic of popset
+
 ## 20170831 - v0.1.8
  - add some option surpported by popset
  - add ':PSet popset' option to show all surpported option by popset

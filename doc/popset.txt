@@ -152,7 +152,9 @@ choose the selenction `cpp` for `lst`. Of course, the `arg` can be any
 type(string, list, dictetory and so on) if you want.
 
 If the `opt` your add had been existed in popset, popset will append the `lst` 
-and `dic` (no `cmd`) but not override the existed one.
+and `dic` (no `cmd`) but not override the existed one. Hence, the `opt` of 
+options you add must be different to other `opt` of options, or you'll mix up 
+the `lst` and `dic` of different options.
 
 
                                                                     |popset-toc|
