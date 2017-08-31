@@ -33,7 +33,7 @@ function! popset#data#AddSelectionsAndComand(sopt, slist, sdict, scmd)
         if has_key(s:popset_data, item)
             call extend(s:popset_data[item][0], a:slist)
             call extend(s:popset_data[item][1], a:sdict, "force")
-            " for the same option but different name (eg. ["foldmethod", "fdm"]),
+            " For the same option but different name (eg. ["foldmethod", "fdm"]),
             " because they have the same "lst", "dic" and "cmd", the key will
             " point to the same data address, that means s:popset_data["foldmethod"] 
             " and s:popset_data["fdm"] pointed to same data address.
@@ -74,7 +74,7 @@ function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: s:getPopsetSurpportedOptionList() {{{
+" FUNCTION: popset#data#GetSurpportedOptionList() {{{
 " get all options surpported by popset
 function! popset#data#GetSurpportedOptionList()
     " get internal option list
@@ -84,14 +84,15 @@ function! popset#data#GetSurpportedOptionList()
     endfor
 
     " convert internal option list to string for search with matchstr
-    let l:lst_string = '|' . join(l:lst, '|') . '|'
+    "let l:lst_string = '|' . join(l:lst, '|') . '|'
 
     if exists("g:Popset_SelectionData")
         " add no-reduplicated user's option to list
         for item in g:Popset_SelectionData
             for str in item["opt"]
                 " if internal list had not include user's option yet
-                if "" == matchstr(l:lst_string, '|' . str . '|')
+                if -1 == match(l:lst, '^' . str . '$')
+                "if "" == matchstr(l:lst_string, '|' . str . '|')
                     let l:lst = add(l:lst, str)
                 endif
             endfor
