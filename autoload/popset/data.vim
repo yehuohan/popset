@@ -166,14 +166,10 @@ function! s:getColorSchemeList()
     let l:scheme_path = split(glob($VIMRUNTIME.'/colors/*.vim'), "\n")
     let l:scheme_list = []
 
-    let l:sep = '\'
-    if has('unix') || has('macunix') || has('win32unix')
-        let l:sep = '/'
-    endif
-
     for item in l:scheme_path
-        call add(l:scheme_list, split(split(item, l:sep)[-1], '\.')[0])
+        call add(l:scheme_list, fnamemodify(item, ":t:r"))
     endfor
+
     return l:scheme_list
 endfunction
 " }}}

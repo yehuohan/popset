@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170901 - v0.2.10
+ - replace path-string searching with fnamemodify to search color scheme list
+
 ## 20170901 - v0.2.9
  - perfect lst and dic of popset
 
