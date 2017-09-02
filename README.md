@@ -16,11 +16,10 @@ Plug 'yehuohan/popset'
 ---
 ## Settings
 
- - Please set `nocompatible` and `hidden` options:
+ - Set `nocompatible` options:
 
 ```vim
 set nocompatible
-set hidden
 ```
 
 ---

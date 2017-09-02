@@ -1,7 +1,10 @@
 
 # ChangeLog 
 
-## 20170901 - v0.2.10
+## 20170902 - v0.2.11
+ - Fix: return previous windown by winnr() when quit popset
+
+## 20170902 - v0.2.10
  - replace path-string searching with fnamemodify to search color scheme list
 
 ## 20170901 - v0.2.9

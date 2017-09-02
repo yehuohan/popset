@@ -69,10 +69,9 @@ and call command PlugInstall.
 --------------------------------------------------------------------------------
  2.2 Options Setting for popset                         |popset-options-setting|
 
-Please set nocompatible and hidden options, which is required by popset: >
+Set nocompatible options is required by popset: >
 
     set nocompatible
-    set hidden
 <
 
                                                                     |popset-toc|

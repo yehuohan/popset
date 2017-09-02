@@ -4,6 +4,7 @@
 let s:config = popset#config#Configuration()
 let b:text = ""
 let b:size = -1
+let s:last_winnr = -1
 let s:is_helptext = 0
 let s:is_datalist = 0
 
@@ -25,6 +26,8 @@ endfunction
 
 " FUNCTION: popset#pop#PopSelection() {{{
 function! popset#pop#PopSelection()
+    " note the winnr for return when kill popset
+    let s:last_winnr = winnr()
     " pop selection to preview window at bottom and ignore the auto-command event
     silent! execute "noautocmd botright pedit popset"
     " Move focus to preview window
@@ -158,7 +161,7 @@ function! popset#pop#Quit()
         " delete buffer and all thing about the preview buffer will be wiped out
         bwipeout
         " return the previous window
-        silent! execute "noautocmd wincmd p"
+        silent! execute "noautocmd " . s:last_winnr . "wincmd w"
         unlet s:killingNow
     endif
 endfunction
