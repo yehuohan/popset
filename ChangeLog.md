@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170905 - v0.2.12
+ - Add options of popset with match case
+
 ## 20170902 - v0.2.11
  - Fix: return previous windown by winnr() when quit popset
 

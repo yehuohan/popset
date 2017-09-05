@@ -107,14 +107,14 @@ function! popset#data#GetSurpportedOptionList()
             let l:key = ""
             for str in item["opt"]
                 " if internal list had not include user's option yet
-                "if "" == matchstr(l:lst_string, '|' . str . '|')
-                if -1 == match(l:lst, '^' . str . '$')
+                "if "" == matchstr(l:lst_string, '\C|' . str . '|')
+                if -1 == match(l:lst, '\C^' . str . '$')
                     " note the non-reduplicated option
                     call add(l:dsr, str)
                 else
                     " note the reduplicate option
                     let l:flg = 1
-                    if -1 != match(l:lst_final, '^' . str . '$')
+                    if -1 != match(l:lst_final, '\C^' . str . '$')
                         let l:key = str
                     endif
                 endif
