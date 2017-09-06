@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170906 - v0.2.13
+ - Set all file's fileformat to unix
+
 ## 20170905 - v0.2.12
  - Add options of popset with match case
 
