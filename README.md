@@ -81,6 +81,8 @@ If the `opt` your add had been existed in popset, popset will append the `lst` a
 :PSet popset
 ```
 
+- More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt)
+
 ---
 ## Contributor
  - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
