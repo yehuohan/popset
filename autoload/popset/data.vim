@@ -226,6 +226,16 @@ let s:popset_selection_data = [
         \ "cmd" : "popset#data#SetEqual",
     \},
     \{
+        \ "opt" : ["laststatus", "ls"],
+        \ "lst" : ["0", "1", "2"],
+        \ "dic" :{
+                \ "0" : "never",
+                \ "1" : "only if there are at least two windows",
+                \ "2" : "always",
+                \},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
         \ "opt" : ["virtualedit", "ve"],
         \ "lst" : ["\"\"", "block", "insert", "all", "onemore"],
         \ "dic" : {

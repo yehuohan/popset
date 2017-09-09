@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170909 - v0.2.15
+ - Add laststatus option to popset
+
 ## 20170909 - v0.2.14
  - Add virtualedit option to popset
 
