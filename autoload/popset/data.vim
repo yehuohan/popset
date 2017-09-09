@@ -33,10 +33,11 @@ function! popset#data#AddSelectionsAndComand(sopt, slist, sdict, scmd)
         if has_key(s:popset_data, item)
             call extend(s:popset_data[item][0], a:slist)
             call extend(s:popset_data[item][1], a:sdict, "force")
-            " For the same option but different name (eg. ["foldmethod", "fdm"]),
+
+            " For the same option but different name (eg. ["colorscheme", "colo"]),
             " because they have the same "lst", "dic" and "cmd", the key will
-            " point to the same data address, that means s:popset_data["foldmethod"] 
-            " and s:popset_data["fdm"] pointed to same data address.
+            " point to the same data address, that means s:popset_data["colorscheme"] 
+            " and s:popset_data["colo"] pointed to same data address.
             " So, appending a:sdcit and s:scmd to only just one item of a:sopt 
             " is ok.
             return
@@ -221,6 +222,18 @@ let s:popset_selection_data = [
                 \ "marker" : "Markers are used to specify folds.",
                 \ "syntax" : "Syntax highlighting items specify folds.",
                 \ "diff"   : "Fold text that is not changed.",
+                \},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
+        \ "opt" : ["virtualedit", "ve"],
+        \ "lst" : ["\"\"", "block", "insert", "all", "onemore"],
+        \ "dic" : {
+                \ "\"\""    : "Default value.",
+                \ "block"   : "Allow virtual editing in Visual block mode.",
+                \ "insert"  : "Allow virtual editing in Insert mode.",
+                \ "all"     : "Allow virtual editing in all modes.",
+                \ "onemore" : "Allow the cursor to move just past the end of the line.",
                 \},
         \ "cmd" : "popset#data#SetEqual",
     \},

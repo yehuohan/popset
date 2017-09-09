@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170909 - v0.2.14
+ - Add virtualedit option to popset
+
 ## 20170906 - v0.2.13
  - Set all file's fileformat to unix
 
