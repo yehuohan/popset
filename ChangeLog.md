@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170911 - v0.2.16
+ - Add conceallevel option to popset
+
 ## 20170909 - v0.2.15
  - Add laststatus option to popset
 

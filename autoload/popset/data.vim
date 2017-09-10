@@ -205,6 +205,17 @@ let s:popset_selection_data = [
         \ "cmd" : "popset#data#SetExecute",
     \},
     \{
+        \ "opt" : ["conceallevel", "cole"],
+        \ "lst" : ["0", "1", "2", "3"],
+        \ "dic" : {
+                \ "0" : "Text is shown normally",
+                \ "1" : "Each block of concealed text is replaced with one character.",
+                \ "2" : "Concealed text is completely hidden unless it has a custom replacement character defined.",
+                \ "3" : "Concealed text is completely hidden.",
+                \},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
         \ "opt" : ["fileformat", "ff"],
         \ "lst" : ["dos", "unix", "mac"],
         \ "dic" : {"dos" : "set EOL to <CR><LF>",
