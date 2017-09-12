@@ -9,6 +9,8 @@ let s:selection_lst = []
 let s:selection_dic = {}
 " what command to execute for selected selection
 let s:selection_cmd = ""
+" what message to show in status line
+let s:selection_msg = ""
 
 
 " SETCION: functions {{{1
@@ -37,14 +39,28 @@ function! popset#selection#SelectionCommand()
 endfunction
 " }}}
 
+" FUNCTION: popset#selection#SelectionMessage() {{{
+function! popset#selection#SelectionMessage()
+    return s:selection_msg
+endfunction
+" }}}
+
 " FUNCTION: popset#selection#SetOption() {{{
 function! popset#selection#SetOption(psoption) 
     let s:selection_opt = a:psoption
     let [s:selection_lst, s:selection_dic, s:selection_cmd] = popset#data#GetSelectionsAndCommand(a:psoption)
+
     if (empty(s:selection_lst) || s:selection_cmd == "")
         echo "'" . a:psoption "' is not surpported at present!"
         return
     endif
+
+    let l:value = popset#data#GetOptionValue(s:selection_opt, s:selection_cmd)
+    let s:selection_msg = "Popset-" . s:selection_opt
+    if !empty(l:value)
+        let s:selection_msg .= " : " . l:value
+    endif
+
     call popset#pop#PopSelection()
 endfunction
 " }}}
@@ -76,6 +92,7 @@ function! popset#selection#Content()
         let l:linetext .= repeat(' ', l:winwid - strwidth(l:linetext) + 1)
         let l:text .= l:linetext . "\n"
     endfor
+
     return [l:text, l:size]
 endfunction
 " }}}

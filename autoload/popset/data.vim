@@ -141,6 +141,20 @@ function! popset#data#GetSurpportedOptionList()
 endfunction
 " }}}
 
+" FUNCTION: popset#data#GetOptionValue(sopt, scmd) {{{
+function! popset#data#GetOptionValue(sopt, scmd)
+    if a:scmd ==# "popset#data#SetEqual"
+        return eval("&".a:sopt)
+    elseif a:scmd ==# "popset#data#SetExecute"
+        if a:sopt ==# "colorscheme" || a:sopt ==# "colo"
+            return g:colors_name
+        endif
+    endif
+
+    return ""
+endfunction
+" }}}
+
 " SECTION: popset selection functions {{{1
 
 " FUNCTION: popset#data#SetEqual(sopt, arg) {{{
@@ -212,6 +226,54 @@ let s:popset_selection_data = [
                 \ "1" : "Each block of concealed text is replaced with one character.",
                 \ "2" : "Concealed text is completely hidden unless it has a custom replacement character defined.",
                 \ "3" : "Concealed text is completely hidden.",
+                \},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
+        \ "opt" : ["encoding", "enc"],
+        \ "lst" : [ "latin1", "utf-8", "cp936", "euc-cn", "cp950",
+                \ "big5", "euc-tw", "cp932", "euc-jp", "sjis",
+                \ "cp949", "euc-kr", "koi8-r", "koi8-u",
+                \],
+        \ "dic" : {
+                \ "latin1"  : "Same as 'ansi', 8-bit characters (ISO 8859-1, also used for cp1252).",
+                \ "utf-8"   : "32 bit UTF-8 encoded Unicode (ISO/IEC 10646-1)",
+                \ "cp936"   : "simplified Chinese (Windows only)",
+                \ "euc-cn"  : "simplified Chinese (Unix only)",
+                \ "cp950"   : "traditional Chinese (on Unix alias for big5)",
+                \ "big5"    : "traditional Chinese (on Windows alias for cp950)",
+                \ "euc-tw"  : "traditional Chinese (Unix only)",
+                \ "cp932"   : "Japanese (Windows only)",
+                \ "euc-jp"  : "Japanese (Unix only)",
+                \ "sjis"    : "Japanese (Unix only)",
+                \ "cp949"   : "Korean (Unix and Windows)",
+                \ "euc-kr"  : "Korean (Unix only)",
+                \ "koi8-r"  : "Russian",
+                \ "koi8-u"  : "Ukrainian",
+                \},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
+        \ "opt" : ["fileencoding", "fenc"],
+        \ "lst" : [ "latin1", "utf-8", "cp936", "euc-cn", "cp950",
+                \ "big5", "euc-tw", "cp932", "euc-jp", "sjis",
+                \ "cp949", "euc-kr", "koi8-r", "koi8-u",
+                \],
+        \ "dic" : {
+                \ "latin1"  : "Same as 'ansi', 8-bit characters (ISO 8859-1, also used for cp1252).",
+                \ "utf-8"   : "32 bit UTF-8 encoded Unicode (ISO/IEC 10646-1)",
+                \ "cp936"   : "simplified Chinese (Windows only)",
+                \ "euc-cn"  : "simplified Chinese (Unix only)",
+                \ "cp950"   : "traditional Chinese (on Unix alias for big5)",
+                \ "big5"    : "traditional Chinese (on Windows alias for cp950)",
+                \ "euc-tw"  : "traditional Chinese (Unix only)",
+                \ "cp932"   : "Japanese (Windows only)",
+                \ "euc-jp"  : "Japanese (Unix only)",
+                \ "sjis"    : "Japanese (Unix only)",
+                \ "cp949"   : "Korean (Unix and Windows)",
+                \ "euc-kr"  : "Korean (Unix only)",
+                \ "koi8-r"  : "Russian",
+                \ "koi8-u"  : "Ukrainian",
                 \},
         \ "cmd" : "popset#data#SetEqual",
     \},

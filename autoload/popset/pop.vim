@@ -29,7 +29,7 @@ function! popset#pop#PopSelection()
     " note the winnr for return when kill popset
     let s:last_winnr = winnr()
     " pop selection to preview window at bottom and ignore the auto-command event
-    silent! execute "noautocmd botright pedit popset"
+    silent! execute "noautocmd botright pedit " . popset#selection#SelectionMessage()
     " Move focus to preview window
     silent! execute "noautocmd wincmd P"
 

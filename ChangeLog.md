@@ -1,6 +1,10 @@
 
 # ChangeLog 
 
+## 20170912 - v0.2.18
+ - Add encoding and fileencoding option to popset
+ - Add showing message in status line
+
 ## 20170911 - v0.2.16
  - Add conceallevel option to popset
 
@@ -17,7 +21,7 @@
  - Add options of popset with match case
 
 ## 20170902 - v0.2.11
- - Fix: return previous windown by winnr() when quit popset
+ - Fix: return previous window by winnr() when quit popset
 
 ## 20170902 - v0.2.10
  - replace path-string searching with fnamemodify to search color scheme list
