@@ -28,7 +28,7 @@ endfunction
 " }}}
 
 " FUNCTION: popset#key#AddMaps(funcName, keys) {{{2
-" map funcName to keys and call funcName with args(...)
+" map funcName to keys and call funcName with string-args(...)
 function! popset#key#AddMaps(funcName, keys, ...)
     let l:arg = []
     for a in a:000

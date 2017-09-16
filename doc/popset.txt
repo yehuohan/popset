@@ -67,7 +67,7 @@ and call command PlugInstall.
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 2.2 Options Setting for popset                         |popset-options-setting|
+ 2.2 Options Setting for popset                         *popset-options-setting*
 
 Set nocompatible options is required by popset: >
 
@@ -79,7 +79,7 @@ Set nocompatible options is required by popset: >
 --------------------------------------------------------------------------------
  2.3 Colors Setting                                              *popset-colors*
 
-You can adjust plugin colors by changing PopsetNormal and PopsetSelected, the
+You can adjust plugin colors by changing PopsetNormal and PopsetSelected, the 
 default vaule is: >
 
     hi link PopsetNormal   PMenu

@@ -56,9 +56,9 @@ function! popset#selection#SetOption(psoption)
     endif
 
     let l:value = popset#data#GetOptionValue(s:selection_opt, s:selection_cmd)
-    let s:selection_msg = "Popset-" . s:selection_opt
+    let s:selection_msg = s:selection_opt
     if !empty(l:value)
-        let s:selection_msg .= " : " . l:value
+        let s:selection_msg .= " = " . l:value
     endif
 
     call popset#pop#PopSelection()

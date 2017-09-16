@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170916 - v0.2.19
+ - Add statusline
+
 ## 20170912 - v0.2.18
  - Add encoding and fileencoding option to popset
  - Add showing message in status line

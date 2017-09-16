@@ -29,12 +29,16 @@ function! popset#pop#PopSelection()
     " note the winnr for return when kill popset
     let s:last_winnr = winnr()
     " pop selection to preview window at bottom and ignore the auto-command event
-    silent! execute "noautocmd botright pedit " . popset#selection#SelectionMessage()
+    silent! execute "noautocmd botright pedit popset"
     " Move focus to preview window
     silent! execute "noautocmd wincmd P"
 
     " set options and maps of preview window
     call s:setBuffer()
+
+    " set statusline value
+    let &l:statusline = popset#pop#StatusLine()
+    setlocal statusline=%!popset#pop#StatusLine()
 
     " get the content and its line-size
     let [b:text, b:size] = popset#selection#Content()
@@ -108,6 +112,19 @@ function! s:displayContent()
     " mark current line with ' >'
     call setline(line("."), " >" . strpart(getline(line(".")), 2))
     setlocal nomodifiable
+endfunction
+" }}}
+
+" FUNCTION: popset#pop#StatusLine() {{{
+function! popset#pop#StatusLine()
+    highlight default link User1 PopsetSLInfos
+    highlight default link User2 PopsetSLValue
+
+    let sl_value  = "%1* Popset "
+    let sl_value .= "%2* " . popset#selection#SelectionMessage() . " "
+    let sl_value .= "%=%1* " . "Num : " . string(line(".")) . "/" .  string(len(popset#selection#SelectionList())) . " "
+
+    return sl_value
 endfunction
 " }}}
 
