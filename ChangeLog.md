@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170916 - v0.2.20
+ - Update popset.png
+
 ## 20170916 - v0.2.19
  - Add statusline
 

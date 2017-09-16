@@ -14,6 +14,7 @@ popset-colors	popset.txt	/*popset-colors*
 popset-command	popset.txt	/*popset-command*
 popset-configuration	popset.txt	/*popset-configuration*
 popset-installation	popset.txt	/*popset-installation*
+popset-options-setting	popset.txt	/*popset-options-setting*
 popset-overview	popset.txt	/*popset-overview*
 popset-toc	popset.txt	/*popset-toc*
 popset-usage	popset.txt	/*popset-usage*
