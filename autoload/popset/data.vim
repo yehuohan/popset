@@ -309,6 +309,12 @@ let s:popset_selection_data = [
         \ "cmd" : "popset#data#SetEqual",
     \},
     \{
+        \ "opt" : ["scrolloff", "so"],
+        \ "lst" : ["0", "1", "2" , "3", "4" , "5", "6", "7", "8", "9", "10"],
+        \ "dic" :{},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
         \ "opt" : ["virtualedit", "ve"],
         \ "lst" : ["\"\"", "block", "insert", "all", "onemore"],
         \ "dic" : {
