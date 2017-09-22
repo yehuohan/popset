@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170922 - v0.2.22
+ - Add linespace option
+
 ## 20170921 - v0.2.21
  - Add scrolloff option
 
