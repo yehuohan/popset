@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170924 - v0.2.24
+ - Add Popset_MaxHeight configuration
+
 ## 20170923 - v0.2.23
  - Update GetFileList() function
 

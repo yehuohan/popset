@@ -32,6 +32,7 @@ Table of Contents                                                   *popset-toc*
  4.8 g:Popset_KeyApplySelection                     |g:Popset_KeyApplySelection|
  4.9 g:Popset_KeyPreviewSelection                 |g:Popset_KeyPreviewSelection|
  4.10 g:Popset_KeyShowHelp                                |g:Popset_KeyShowHelp|
+ 4.11 g:Popset_MaxHeight                                    |g:Popset_MaxHeight|
 5. License                                                      |popset-license|
 
 
@@ -267,6 +268,20 @@ Default vaule: >
 
     let g:Popset_KeyShowHelp = ["?"]
 <
+                                                                    |popset-toc|
+
+
+--------------------------------------------------------------------------------
+ 4.11 g:Popset_MaxHeight                                    *g:Popset_MaxHeight*
+
+Setting the max height of popset-window. g:Popset_MaxHeight works when greater
+than 0.
+
+Default value: >
+
+    let g:Popset_MaxHeight = 0
+<
+
                                                                     |popset-toc|
 
 ================================================================================

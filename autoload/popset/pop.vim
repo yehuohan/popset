@@ -98,6 +98,9 @@ endfunction
 " FUNCTION: s:displayContent() {{{
 function! s:displayContent()
     let l:maxsize = &lines / 3
+    if s:config.MaxHeight > 0
+        let l:maxsize = s:config.MaxHeight
+    endif
     if b:size > l:maxsize
         silent! execute "resize" l:maxsize
     else

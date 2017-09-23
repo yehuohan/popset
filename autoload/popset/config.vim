@@ -4,6 +4,7 @@
 let s:configuration = {
     \ "DataPath"            : "",
     \ "CompleteAll"         : 0,
+    \ "MaxHeight"           : 0,
     \ "KeyQuit"             : ["q", "Esc"],
     \ "KeyMoveCursorDown"   : ["j"],
     \ "KeyMoveCursorUp"     : ["k"],
