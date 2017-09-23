@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170923 - v0.2.23
+ - Update GetFileList() function
+
 ## 20170922 - v0.2.22
  - Add linespace option
 

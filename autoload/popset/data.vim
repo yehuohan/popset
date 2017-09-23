@@ -176,9 +176,9 @@ function! popset#data#SetPopsetOption(sopt, arg)
 endfunction
 " }}}
 
-" FUNCTION: s:getColorSchemeList() {{{
-function! s:getColorSchemeList()
-    let l:scheme_path = split(glob($VIMRUNTIME.'/colors/*.vim'), "\n")
+" FUNCTION: popset#data#GetFileList(pat) {{{
+function! popset#data#GetFileList(pat)
+    let l:scheme_path = split(glob(a:pat), "\n")
     let l:scheme_list = []
 
     for item in l:scheme_path
@@ -214,7 +214,7 @@ let s:popset_selection_data = [
     \},
     \{
         \ "opt" : ["colorscheme", "colo"],
-        \ "lst" : s:getColorSchemeList(),
+        \ "lst" : popset#data#GetFileList($VIMRUNTIME.'/colors/*.vim'),
         \ "dic" : {},
         \ "cmd" : "popset#data#SetExecute",
     \},
