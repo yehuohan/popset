@@ -8,6 +8,7 @@ g:Popset_KeyMoveCursorUp	popset.txt	/*g:Popset_KeyMoveCursorUp*
 g:Popset_KeyPreviewSelection	popset.txt	/*g:Popset_KeyPreviewSelection*
 g:Popset_KeyQuit	popset.txt	/*g:Popset_KeyQuit*
 g:Popset_KeyShowHelp	popset.txt	/*g:Popset_KeyShowHelp*
+g:Popset_MaxHeight	popset.txt	/*g:Popset_MaxHeight*
 g:Popset_SelectionData	popset.txt	/*g:Popset_SelectionData*
 popset	popset.txt	/*popset*
 popset-colors	popset.txt	/*popset-colors*

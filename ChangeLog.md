@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170925 - v0.2.25
+ - Update README.md
+
 ## 20170924 - v0.2.24
  - Add Popset_MaxHeight configuration
 

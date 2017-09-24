@@ -26,11 +26,18 @@ set nocompatible
 ## Usage
 
 There is only one command `PSet`, which is similar to `set` command, in popset.
-For example:
+Example for `foldmethod`:
 ```
 :PSet foldmethod
 ```
-![popset](popset.png)
+![PopsetEx](popset1.gif)
+
+Example for `colorscheme`:
+```
+:PSet colorscheme
+```
+![PopsetEx](popset2.gif)
+
 
 In popset view, you can use following command:
 

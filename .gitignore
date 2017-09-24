@@ -8,6 +8,7 @@
 !/.gitignore
 !/*.md
 !/*.png
+!/*.gif
 !/LICENSE
 !/autoload
 !/doc
