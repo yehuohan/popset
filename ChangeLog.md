@@ -1,6 +1,10 @@
 
 # ChangeLog 
 
+## 20170925 - v0.2.27
+ - Add foldcolumn option
+ - Add nofoldenable and foldcolumn=1 to popset view
+
 ## 20170925 - v0.2.25
  - Update README.md
 

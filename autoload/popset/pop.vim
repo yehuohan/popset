@@ -68,9 +68,11 @@ function! s:setBuffer()
     endif
     setlocal nocursorcolumn
     setlocal nocursorline
+    setlocal nofoldenable
+    setlocal foldcolumn=1
     setlocal nospell
     setlocal nolist
-    setlocal cc=
+    setlocal colorcolumn=
     setlocal filetype=popset
 
     " save timeoutlen
