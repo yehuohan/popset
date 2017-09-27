@@ -327,6 +327,15 @@ let s:popset_selection_data = [
         \ "cmd" : "popset#data#SetEqual",
     \},
     \{
+        \ "opt" : ["signcolumn", "scl"],
+        \ "lst" : ["auto", "yes", "no"],
+        \ "dic" :{
+                \ "auto" : "only when there is a sign to display",
+                \ "no"   : "never",
+                \ "yes"  : "always",},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
         \ "opt" : ["virtualedit", "ve"],
         \ "lst" : ["\"\"", "block", "insert", "all", "onemore"],
         \ "dic" : {

@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20170927 - v0.2.28
+ - Add signcolumn option
+
 ## 20170925 - v0.2.27
  - Add foldcolumn option
  - Add nofoldenable and foldcolumn=1 to popset view
