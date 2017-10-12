@@ -36,7 +36,7 @@ function! popset#data#AddSelectionsAndComand(sopt, slist, sdict, scmd)
 
             " For the same option but different name (eg. ["colorscheme", "colo"]),
             " because they have the same "lst", "dic" and "cmd", the key will
-            " point to the same data address, that means s:popset_data["colorscheme"] 
+            " point to the same data address, that means s:popset_data["colorscheme"]
             " and s:popset_data["colo"] pointed to same data address.
             " So, appending a:sdcit and s:scmd to only just one item of a:sopt 
             " is ok.
@@ -234,6 +234,7 @@ let s:popset_selection_data = [
         \ "lst" : [ "latin1", "utf-8", "cp936", "euc-cn", "cp950",
                 \ "big5", "euc-tw", "cp932", "euc-jp", "sjis",
                 \ "cp949", "euc-kr", "koi8-r", "koi8-u",
+                \ "ucs-2be", "ucs-2le", "utf-16", "utf-16le",
                 \],
         \ "dic" : {
                 \ "latin1"  : "Same as 'ansi', 8-bit characters (ISO 8859-1, also used for cp1252).",
@@ -250,6 +251,10 @@ let s:popset_selection_data = [
                 \ "euc-kr"  : "Korean (Unix only)",
                 \ "koi8-r"  : "Russian",
                 \ "koi8-u"  : "Ukrainian",
+                \ "ucs-2be" : "16 bit UCS-2 encoded Unicode, big endian(ISO/IEC 10646-1)",
+                \ "ucs-2le" : "like ucs-2, little endian",
+                \ "utf-16"	: "ucs-2 extended with double-words for more characters",
+                \ "utf-16le": "like utf-16, little endian",
                 \},
         \ "cmd" : "popset#data#SetEqual",
     \},
@@ -258,6 +263,7 @@ let s:popset_selection_data = [
         \ "lst" : [ "latin1", "utf-8", "cp936", "euc-cn", "cp950",
                 \ "big5", "euc-tw", "cp932", "euc-jp", "sjis",
                 \ "cp949", "euc-kr", "koi8-r", "koi8-u",
+                \ "ucs-2be", "ucs-2le", "utf-16", "utf-16le",
                 \],
         \ "dic" : {
                 \ "latin1"  : "Same as 'ansi', 8-bit characters (ISO 8859-1, also used for cp1252).",
@@ -274,6 +280,10 @@ let s:popset_selection_data = [
                 \ "euc-kr"  : "Korean (Unix only)",
                 \ "koi8-r"  : "Russian",
                 \ "koi8-u"  : "Ukrainian",
+                \ "ucs-2be" : "16 bit UCS-2 encoded Unicode, big endian(ISO/IEC 10646-1)",
+                \ "ucs-2le" : "like ucs-2, little endian",
+                \ "utf-16"	: "ucs-2 extended with double-words for more characters",
+                \ "utf-16le": "like utf-16, little endian",
                 \},
         \ "cmd" : "popset#data#SetEqual",
     \},

@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20171012 - v0.2.29
+ - Update enc and fenc options
+
 ## 20170927 - v0.2.28
  - Add signcolumn option
 
