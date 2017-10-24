@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20171012 - v0.2.30
+ - docs(README.md): Update README.md
+
 ## 20171012 - v0.2.29
  - Update enc and fenc options
 
