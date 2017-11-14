@@ -23,13 +23,17 @@ set nocompatible
 ```
 
 ---
-## Usage
+## Command Usage
+
+### PSet
 
 There is only one command `PSet`, which is similar to `set` command, in popset.
 Example for `foldmethod`:
+
 ```
 :PSet foldmethod
 ```
+
 ![PopsetEx](popset1.gif)
 
 Example for `colorscheme`:
@@ -62,20 +66,20 @@ let g:Popset_CompleteAll = 0    " auto complete commands surpported by popset
  - Add your own selections by adding the following example code to `.vimrc`:
 
 ```vim
-    let g:Popset_SelectionData = [
-        \{
-            \ "opt" : ["filetype", "ft"],
-            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
-            \ "dic" : {
-                    \ "python" : "python script file",
-                    \ "vim": "Vim script file",
-                    \ },
-            \ "cmd" : "g:SetEqual",
-        \},
-        \]
-    function! g:SetEqual(sopt, arg)
-        execute "set " . a:sopt . "=" . a:arg
-    endfunction
+let g:Popset_SelectionData = [
+    \{
+        \ "opt" : ["filetype", "ft"],
+        \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
+        \ "dic" : {
+                \ "python" : "python script file",
+                \ "vim": "Vim script file",
+                \ },
+        \ "cmd" : "g:SetEqual",
+    \},
+    \]
+function! g:SetEqual(sopt, arg)
+    execute "set " . a:sopt . "=" . a:arg
+endfunction
 ```
 
 The key `opt` is the option name list to add, `lst` is the selections of the `opt`, `dic` is simple description of `lst` and `dic` can be empty, and `cmd` is the function that should be called with `opt` and `lst` args. In the example code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` for `lst`. Of course, the `arg` can be any type(string, list, dictetory and so on) if you want.
@@ -88,7 +92,41 @@ If the `opt` your add had been existed in popset, popset will append the `lst` a
 :PSet popset
 ```
 
-- More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt)
+---
+## Function Usage
+
+### PopSelection()
+
+`PopSelection(dictionary, flag)` is used to pop selections with given a `dictionary` and a `flag`.
+The `dictionary` is similar to g:Popset_SelectionData. Another example:
+
+```vim
+let g:profile = 
+    \{
+        \ "opt" : ["Which file is your want?"],
+        \ "lst" : ["a.cpp", "b.vim", "c.md"]
+        \ "dic" : {
+                \ "a.cpp" : "cpp file",
+                \ },
+        \ "cmd" : "g:SetEcho",
+    \}
+function! g:SetEcho(sopt, arg)
+    echo  a:arg
+endfunction
+```
+
+The `flag` indicate whether previewing result of executing `cmd` is allowd or not. `flag` can be ignored and the default value for `flag` is 1.
+Following is the example showing how to call `PopSelection()`.
+
+```vim
+call PopSelection(g:Popset_SelectionData[0])
+call PopSelection(g:profile, 1)
+```
+
+---
+## Help doc
+
+More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt)
 
 ---
 ## Contributor

@@ -1,6 +1,9 @@
 
 # ChangeLog 
 
+## 20171114 - v1.0.0
+ - feat: Add PopSelection function as interface
+
 ## 20171012 - v0.2.30
  - docs(README.md): Update README.md
 

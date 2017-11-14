@@ -21,19 +21,21 @@ Table of Contents                                                   *popset-toc*
  2.3 Colors Setting                                              |popset-colors|
 3. Command                                                      |popset-command|
  3.1 PSet                                                                |:PSet|
-4. Configuration                                          |popset-configuration|
- 4.1 g:Popset_SelectionData                             |g:Popset_SelectionData|
- 4.2 g:Popset_CompleteAll                                 |g:Popset_CompleteAll|
- 4.3 g:Popset_KeyQuit                                         |g:Popset_KeyQuit|
- 4.4 g:Popset_KeyMoveCursorDown                     |g:Popset_KeyMoveCursorDown|
- 4.5 g:Popset_KeyMoveCursorUp                         |g:Popset_KeyMoveCursorUp|
- 4.6 g:Popset_KeyMoveCursorPgDown                 |g:Popset_KeyMoveCursorPgDown|
- 4.7 g:Popset_KeyMoveCursorPgUp                     |g:Popset_KeyMoveCursorPgUp|
- 4.8 g:Popset_KeyApplySelection                     |g:Popset_KeyApplySelection|
- 4.9 g:Popset_KeyPreviewSelection                 |g:Popset_KeyPreviewSelection|
- 4.10 g:Popset_KeyShowHelp                                |g:Popset_KeyShowHelp|
- 4.11 g:Popset_MaxHeight                                    |g:Popset_MaxHeight|
-5. License                                                      |popset-license|
+4. Function                                                    |popset-function|
+ 4.1 PopSelection                                                 |PopSelection|
+5. Configuration                                          |popset-configuration|
+ 5.1 g:Popset_SelectionData                             |g:Popset_SelectionData|
+ 5.2 g:Popset_CompleteAll                                 |g:Popset_CompleteAll|
+ 5.3 g:Popset_KeyQuit                                         |g:Popset_KeyQuit|
+ 5.4 g:Popset_KeyMoveCursorDown                     |g:Popset_KeyMoveCursorDown|
+ 5.5 g:Popset_KeyMoveCursorUp                         |g:Popset_KeyMoveCursorUp|
+ 5.6 g:Popset_KeyMoveCursorPgDown                 |g:Popset_KeyMoveCursorPgDown|
+ 5.7 g:Popset_KeyMoveCursorPgUp                     |g:Popset_KeyMoveCursorPgUp|
+ 5.8 g:Popset_KeyApplySelection                     |g:Popset_KeyApplySelection|
+ 5.9 g:Popset_KeyPreviewSelection                 |g:Popset_KeyPreviewSelection|
+ 5.10 g:Popset_KeyShowHelp                                |g:Popset_KeyShowHelp|
+ 5.11 g:Popset_MaxHeight                                    |g:Popset_MaxHeight|
+6. License                                                      |popset-license|
 
 
 ================================================================================
@@ -122,8 +124,46 @@ To see all the surpported options of popset: >
 <
                                                                     |popset-toc|
 
+
 ================================================================================
-4. Configuration                                          *popset-configuration*
+4. Function                                                    *popset-function*
+
+                                                                    |popset-toc|
+
+--------------------------------------------------------------------------------
+ 4.1 PopSelection                                                 *PopSelection*
+
+
+PopSelection(`dictionary,` `flag)` is used to pop selections with given a
+`dictionary` and a `flag.`
+A `dictionary` example: >
+
+    let g:profile = 
+        \{
+            \ "opt" : ["Which file is your want?"],
+            \ "lst" : ["a.cpp", "b.vim", "c.md"]
+            \ "dic" : {
+                    \ "a.cpp" : "cpp file",
+                    \ },
+            \ "cmd" : "g:SetEcho",
+        \}
+    function! g:SetEcho(sopt, arg)
+        echo  a:arg
+    endfunction
+<
+
+The `flag` indicate whether previewing result of executing `cmd` is allowd or not.
+`flag` can be ignored and the default value for `flag` is 1.
+Following is the example showing how to call `PopSelection()` : >
+
+    call PopSelection(g:Popset_SelectionData[0])
+    call PopSelection(g:profile, 1)
+<
+
+                                                                    |popset-toc|
+
+================================================================================
+5. Configuration                                          *popset-configuration*
 
 There some option in popset you can change to make popset more convinient for 
 you.
@@ -131,7 +171,7 @@ you.
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.1 g:Popset_SelectionData                             *g:Popset_SelectionData*
+ 5.1 g:Popset_SelectionData                             *g:Popset_SelectionData*
 
 This option can help you to add your own selections to popset. Following is the 
 example code in .vimrc: >
@@ -168,7 +208,7 @@ the `lst` and `dic` of different options.
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.2 g:Popset_CompleteAll                                 *g:Popset_CompleteAll*
+ 5.2 g:Popset_CompleteAll                                 *g:Popset_CompleteAll*
 
 This is used to set auto completion of PSet. Set this to 1 means that setting
 PSet auto completion list to all command of vim, and 0 means that setting PSet
@@ -182,7 +222,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.3 g:Popset_KeyQuit                                         *g:Popset_KeyQuit*
+ 5.3 g:Popset_KeyQuit                                         *g:Popset_KeyQuit*
 
 Setting the keys to Quit pop selection.
 
@@ -194,7 +234,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.4 g:Popset_KeyMoveCursorDown                     *g:Popset_KeyMoveCursorDown*
+ 5.4 g:Popset_KeyMoveCursorDown                     *g:Popset_KeyMoveCursorDown*
 
 Setting the keys to Move the selection bar down.
 
@@ -205,7 +245,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.5 g:Popset_KeyMoveCursorUp                         *g:Popset_KeyMoveCursorUp*
+ 5.5 g:Popset_KeyMoveCursorUp                         *g:Popset_KeyMoveCursorUp*
 
 Setting the keys to Move the selection bar up.
 
@@ -216,7 +256,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.6 g:Popset_KeyMoveCursorPgDown                 *g:Popset_KeyMoveCursorPgDown*
+ 5.6 g:Popset_KeyMoveCursorPgDown                 *g:Popset_KeyMoveCursorPgDown*
 
 Setting the keys to Move the selection bar one screen down. 
 
@@ -227,7 +267,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.7 g:Popset_KeyMoveCursorPgUp                     *g:Popset_KeyMoveCursorPgUp*
+ 5.7 g:Popset_KeyMoveCursorPgUp                     *g:Popset_KeyMoveCursorPgUp*
 
 Setting the keys to Move the selection bar one screen up. 
 
@@ -238,7 +278,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.8 g:Popset_KeyApplySelection                     *g:Popset_KeyApplySelection*
+ 5.8 g:Popset_KeyApplySelection                     *g:Popset_KeyApplySelection*
 
 Setting the keys to Load the selection.
 
@@ -249,7 +289,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.9 g:Popset_KeyPreviewSelection                 *g:Popset_KeyPreviewSelection*
+ 5.9 g:Popset_KeyPreviewSelection                 *g:Popset_KeyPreviewSelection*
 
 Setting the keys to Previous the selection.
 
@@ -260,7 +300,7 @@ Default vaule: >
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 4.10 g:Popset_KeyShowHelp                                 *g:Popset_KeyShowHelp*
+ 5.10 g:Popset_KeyShowHelp                                 *g:Popset_KeyShowHelp*
 
 Setting the keys to Show Help.
 
@@ -272,7 +312,7 @@ Default vaule: >
 
 
 --------------------------------------------------------------------------------
- 4.11 g:Popset_MaxHeight                                    *g:Popset_MaxHeight*
+ 5.11 g:Popset_MaxHeight                                    *g:Popset_MaxHeight*
 
 Setting the max height of popset-window. g:Popset_MaxHeight works when greater
 than 0.
@@ -285,7 +325,7 @@ Default value: >
                                                                     |popset-toc|
 
 ================================================================================
-5. License                                                      |popset-license|
+6. License                                                      |popset-license|
 
 MIT License
 

@@ -6,7 +6,6 @@ let b:text = ""
 let b:size = -1
 let s:last_winnr = -1
 let s:is_helptext = 0
-let s:is_datalist = 0
 
 
 " SETCION: functions {{{1
@@ -42,12 +41,6 @@ function! popset#pop#PopSelection()
 
     " get the content and its line-size
     let [b:text, b:size] = popset#selection#Content()
-
-    if "popset" == popset#selection#SelectionOption()
-        let s:is_datalist = 1
-    else
-        let s:is_datalist = 0
-    endif
 
     " display content on preview window
     call s:displayContent()
@@ -148,7 +141,10 @@ endfunction
 
 " FUNCTION: popset#pop#PreviewSelection() {{{
 function! popset#pop#PreviewSelection()
-    if s:is_helptext == 1 || s:is_datalist == 1
+    if !popset#selection#SelectionPreviewAllowed()
+        return
+    endif
+    if s:is_helptext == 1
         return
     endif
     let s:last_line = line(".")

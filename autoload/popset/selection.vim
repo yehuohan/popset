@@ -1,6 +1,7 @@
 
 " SECTION: variables {{{1
 
+" Set all the following selection_* variables before call function of pop.vim
 " what option to set
 let s:selection_opt = ""
 " what selections to choose for option
@@ -11,6 +12,8 @@ let s:selection_dic = {}
 let s:selection_cmd = ""
 " what message to show in status line
 let s:selection_msg = ""
+" whether allow preview
+let s:selection_pre = 1
 
 
 " SETCION: functions {{{1
@@ -45,10 +48,17 @@ function! popset#selection#SelectionMessage()
 endfunction
 " }}}
 
+" FUNCTION: popset#selection#SelectionPreviewAllowed() {{{
+function! popset#selection#SelectionPreviewAllowed()
+    return s:selection_pre
+endfunction
+" }}}
+
 " FUNCTION: popset#selection#SetOption() {{{
 function! popset#selection#SetOption(psoption) 
     let s:selection_opt = a:psoption
     let [s:selection_lst, s:selection_dic, s:selection_cmd] = popset#data#GetSelectionsAndCommand(a:psoption)
+    let s:selection_pre = ("popset" == popset#selection#SelectionOption()) ? 0 : 1
 
     if (empty(s:selection_lst) || s:selection_cmd == "")
         echo "'" . a:psoption "' is not surpported at present!"
@@ -60,6 +70,19 @@ function! popset#selection#SetOption(psoption)
     if !empty(l:value)
         let s:selection_msg .= " = " . l:value
     endif
+
+    call popset#pop#PopSelection()
+endfunction
+" }}}
+
+" FUNCTION: popset#selection#SetOptionDict(dict) {{{
+function! popset#selection#SetOptionDict(dict, preview)
+    let s:selection_opt = a:dict["opt"][0]
+    let s:selection_lst = a:dict["lst"]
+    let s:selection_dic = a:dict["dic"]
+    let s:selection_cmd = a:dict["cmd"]
+    let s:selection_msg = s:selection_opt
+    let s:selection_pre = a:preview
 
     call popset#pop#PopSelection()
 endfunction
