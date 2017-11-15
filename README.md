@@ -1,5 +1,5 @@
 
-**Popset** is a vim plugin to `Pop selections for vim option settings`, which will be convinient for setting vim options.
+**Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing some function and so on.
 
 **Popset** is inspired bySzymon Wrozynski plugin [vim-CtrlSpapce](https://github.com/vim-ctrlspace/vim-ctrlspace) and some plugin code of popset is based on vim-ctrlspace and Thanks a lot.
 
