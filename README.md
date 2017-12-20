@@ -4,7 +4,7 @@
  - [Command Usage](#3)
     - [PSet](#3.1)
  - [Function Usage](#4)
-     - [PopSelection](#4.1)
+    - [PopSelection](#4.1)
  - [Help doc](#5)
  - [Contributor](#6)
 
@@ -144,6 +144,7 @@ More help about popset please see [popset.txt](https://github.com/yehuohan/popse
 
 ---
 <h2 id="6">Contributor</h2>
+
  - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
 
 
