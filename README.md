@@ -1,11 +1,22 @@
 
+ - [Installation](#1)
+ - [Settings](#2)
+ - [Command Usage](#3)
+    - [PSet](#3.1)
+ - [Function Usage](#4)
+     - [PopSelection](#4.1)
+ - [Help doc](#5)
+ - [Contributor](#6)
+
+---
+
 **Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing some function and so on.
 
 **Popset** is inspired bySzymon Wrozynski plugin [vim-CtrlSpapce](https://github.com/vim-ctrlspace/vim-ctrlspace) and some plugin code of popset is based on vim-ctrlspace and Thanks a lot.
 
 
 ---
-## Installation
+<h2 id="1">Installation</h2>
 
 For vim-plug, add to your `.vimrc`:
 
@@ -14,7 +25,7 @@ Plug 'yehuohan/popset'
 ```
 
 ---
-## Settings
+<h2 id="2">Settings</h2>
 
  - Set `nocompatible` options:
 
@@ -23,9 +34,9 @@ set nocompatible
 ```
 
 ---
-## Command Usage
+<h2 id="3">Command Usage</h2>
 
-### PSet
+<h3 id="3.1">PSet</h3>
 
 There is only one command `PSet`, which is similar to `set` command, in popset.
 Example for `foldmethod`:
@@ -92,10 +103,13 @@ If the `opt` your add had been existed in popset, popset will append the `lst` a
 :PSet popset
 ```
 
----
-## Function Usage
+All the surpported options is according to help-doc of vim8.0.
 
-### PopSelection()
+
+---
+<h2 id="4">Function Usage</h2>
+
+<h3 id="4.1">PopSelection</h3>
 
 `PopSelection(dictionary, flag)` is used to pop selections with given a `dictionary` and a `flag`.
 The `dictionary` is similar to g:Popset_SelectionData. Another example:
@@ -124,12 +138,12 @@ call PopSelection(g:profile, 1)
 ```
 
 ---
-## Help doc
+<h2 id="5">Help doc</h2>
 
 More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt)
 
 ---
-## Contributor
+<h2 id="6">Contributor</h2>
  - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
 
 

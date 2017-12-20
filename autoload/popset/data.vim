@@ -38,7 +38,7 @@ function! popset#data#AddSelectionsAndComand(sopt, slist, sdict, scmd)
             " because they have the same "lst", "dic" and "cmd", the key will
             " point to the same data address, that means s:popset_data["colorscheme"]
             " and s:popset_data["colo"] pointed to same data address.
-            " So, appending a:sdcit and s:scmd to only just one item of a:sopt 
+            " So, appending a:sdcit and s:scmd to only just one item of a:sopt
             " is ok.
             return
         else
@@ -60,7 +60,7 @@ endfunction
 " }}}
 
 " FUNCTION: popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos) {{{
-" get customelist for PSet complete 
+" get customelist for PSet complete
 function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
     let l:completekeys = []
 
@@ -86,12 +86,12 @@ function! popset#data#GetSurpportedOptionList()
     for item in s:popset_selection_data[1:-1]
         call extend(l:lst, item["opt"])
 
-        " append the fisrt item of opt-list to selection list of popset option 
+        " append the fisrt item of opt-list to selection list of popset option
         call add(l:lst_final, item["opt"][0])
 
         " append the reset item of opt-list as description dictory
         if len(item["opt"]) > 1
-            let l:dic_final[item["opt"][0]] = 
+            let l:dic_final[item["opt"][0]] =
                 \ "Also equals to '" . join(item["opt"][1:-1], "','") . "'"
         endif
     endfor
@@ -125,7 +125,7 @@ function! popset#data#GetSurpportedOptionList()
                 " no reduplicated option in 'item' compared to internal option
                 call add(l:lst_final, item["opt"][0])
                 if len(item["opt"]) > 1
-                    let l:dic_final[item["opt"][0]] = 
+                    let l:dic_final[item["opt"][0]] =
                         \ "Also equals to '" . join(item["opt"][1:-1], "','") . "'"
                 endif
             else
@@ -170,7 +170,7 @@ endfunction
 " }}}
 
 " FUNCTION: popset#data#SetPopsetOption(sopt, arg) {{{
-" set the option selected by popset 
+" set the option selected by popset
 function! popset#data#SetPopsetOption(sopt, arg)
     call popset#selection#SetOption(a:arg)
 endfunction
@@ -208,7 +208,7 @@ let s:popset_selection_data = [
     \{
         \ "opt" : ["background", "bg"],
         \ "lst" : ["dark", "light"],
-        \ "dic" : {"data": "dark background color", 
+        \ "dic" : {"data": "dark background color",
                  \ "ligth": "light background color"},
         \ "cmd" : "popset#data#SetEqual",
     \},
@@ -217,6 +217,25 @@ let s:popset_selection_data = [
         \ "lst" : popset#data#GetFileList($VIMRUNTIME.'/colors/*.vim'),
         \ "dic" : {},
         \ "cmd" : "popset#data#SetExecute",
+    \},
+    \{
+        \ "opt" : ["completeopt", "cot"],
+        \ "lst" : ["menu", "menuone", "longest",
+                \ "menu,preview", "menuone,preview",
+                \ "menu,noinsert", "menuone,noinsert",
+                \ "menu,noselect", "menuone,noselect"],
+        \ "dic" : {
+                \ "menu"             : "Use a popup menu to show the possible completions.",
+                \ "menuone"          : "Use the popup menu also when there is only one match.",
+                \ "longest"          : "Only insert the longest common text of the matches.",
+                \ "menu,preview"     : "Show extra information about the currently selected completion in the preview window.",
+                \ "menuone,preview"  : "Show extra information about the currently selected completion in the preview window.",
+                \ "menu,noinsert"    : "Do not insert any text for a match until the user selects a match from the menu.",
+                \ "menuone,noinsert" : "Do not insert any text for a match until the user selects a match from the menu.",
+                \ "menu,noselect"    : "Do not select a match in the menu, force the user to select one from the menu.",
+                \ "menuone,noselect" : "Do not select a match in the menu, force the user to select one from the menu.",
+                \ },
+        \ "cmd" : "popset#data#SetEqual",
     \},
     \{
         \ "opt" : ["conceallevel", "cole"],
