@@ -365,6 +365,18 @@ let s:popset_selection_data = [
         \ "cmd" : "popset#data#SetEqual",
     \},
     \{
+        \ "opt" : ["shiftwidth", "sw"],
+        \ "lst" : ["2", "3", "4", "8"],
+        \ "dic" :{},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
+        \ "opt" : ["tabstop", "ts"],
+        \ "lst" : ["2", "3", "4", "8"],
+        \ "dic" :{},
+        \ "cmd" : "popset#data#SetEqual",
+    \},
+    \{
         \ "opt" : ["virtualedit", "ve"],
         \ "lst" : ["\"\"", "block", "insert", "all", "onemore"],
         \ "dic" : {
