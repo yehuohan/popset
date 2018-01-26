@@ -1,60 +1,40 @@
 
 " SECTION: variables {{{1
 " s:popset_data format
-" {opt1: [ [lst], {dic}, "cmd"],
-"  opt2: [ [lst], {dic}, "cmd"],
+" {opt1: [ [lst], {dic}, 'cmd'],
+"  opt2: [ [lst], {dic}, 'cmd'],
 "  ......
 " }
 let s:popset_data = {}
+" map shortname to fullname
+let s:popset_opt_shortname = {}
 
 
 " SETCION: functions {{{1
 
 " FUNCTION: popset#data#Init() {{{
 function! popset#data#Init()
-    " generate surpported option list to s:popset_selection_data[0]
-    call popset#data#GetSurpportedOptionList()
+    let s:popset_data = {}
+    let s:popset_opt_shortname = {}
 
-    " add popset-selection-data to popset-data
-    for data in s:popset_selection_data
-        call popset#data#AddSelectionsAndComand(data["opt"], data["lst"], data["dic"], data["cmd"])
-    endfor
-    if exists("g:Popset_SelectionData")
-        for data in g:Popset_SelectionData
-            call popset#data#AddSelectionsAndComand(data["opt"], data["lst"], data["dic"], data["cmd"])
-        endfor
-    endif
+    " generate option data
+    call s:getSurpportedOptionData()
+    call s:createPopsetOption()
 endfunction
 " }}}
 
-" FUNCTION: popset#data#AddSelectionsAndComand(sopt, slist, sdict, scmd) {{{
-function! popset#data#AddSelectionsAndComand(sopt, slist, sdict, scmd)
-    for item in a:sopt
-        if has_key(s:popset_data, item)
-            call extend(s:popset_data[item][0], a:slist)
-            call extend(s:popset_data[item][1], a:sdict, "force")
-
-            " For the same option but different name (eg. ["colorscheme", "colo"]),
-            " because they have the same "lst", "dic" and "cmd", the key will
-            " point to the same data address, that means s:popset_data["colorscheme"]
-            " and s:popset_data["colo"] pointed to same data address.
-            " So, appending a:sdcit and s:scmd to only just one item of a:sopt
-            " is ok.
-            return
-        else
-            let s:popset_data[item] = [a:slist, a:sdict, a:scmd]
-        endif
-    endfor
-endfunction
-" }}}
-
-" FUNCTION: popset#data#GetSelectionsAndCommand(psoption) {{{
+" FUNCTION: popset#data#GetSelectionsAndCommand(sopt) {{{
 " return [list, dict, cmd]
-function! popset#data#GetSelectionsAndCommand(psoption)
-    if has_key(s:popset_data, a:psoption)
-        return s:popset_data[a:psoption]
+function! popset#data#GetSelectionsAndCommand(sopt)
+    " option is given in shortname
+    if has_key(s:popset_opt_shortname, a:sopt)
+        return s:popset_data[s:popset_opt_shortname[a:sopt]]
+    endif
+    " option is given in fullname
+    if has_key(s:popset_data, a:sopt)
+        return s:popset_data[a:sopt]
     else
-        return [[], {}, ""]
+        return [[], {}, '']
     endif
 endfunction
 " }}}
@@ -64,10 +44,15 @@ endfunction
 function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
     let l:completekeys = []
 
-    " search fitable args
-    for key in keys(s:popset_data)
-        if key =~ "^".a:arglead
-            call add(l:completekeys, key)
+    " search shortname
+    if has_key(s:popset_opt_shortname, a:arglead)
+        call add(l:completekeys, s:popset_opt_shortname[a:arglead])
+    endif
+
+    " search fullname
+    for l:key in s:popset_data['popset']['lst']
+        if l:key =~ "^".a:arglead
+            call add(l:completekeys, l:key)
         endif
     endfor
 
@@ -75,69 +60,58 @@ function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: popset#data#GetSurpportedOptionList() {{{
-" get all options surpported by popset
-function! popset#data#GetSurpportedOptionList()
-    let l:lst = []
-    let l:lst_final = []
-    let l:dic_final = {}
+" FUNCTION: s:addSelectionsAndCommand(sopt, slist, sdict, scmd) {{{
+function! s:addSelectionsAndCommand(sopt, slist, sdict, scmd)
+    " detect whether user's option is reduplicated
+    if has_key(s:popset_data, a:sopt)
+        call extend(s:popset_data[a:sopt][0], a:slist)
+        call extend(s:popset_data[a:sopt][1], a:sdict, 'force')
+    else
+        let s:popset_data[a:sopt] = [a:slist, a:sdict, a:scmd]
+    endif
+endfunction
+" }}}
 
-    " get internal option list
-    for item in s:popset_selection_data[1:-1]
-        call extend(l:lst, item["opt"])
+" FUNCTION: s:getSurpportedOptionData() {{{
+function! s:getSurpportedOptionData()
+    " generate internal option data
+    for l:item in s:popset_selection_data[1:-1]
+        " add option to popset_data
+        call s:addSelectionsAndCommand(l:item['opt'][0], l:item['lst'], l:item['dic'], l:item['cmd'])
 
-        " append the fisrt item of opt-list to selection list of popset option
-        call add(l:lst_final, item["opt"][0])
-
-        " append the reset item of opt-list as description dictory
-        if len(item["opt"]) > 1
-            let l:dic_final[item["opt"][0]] =
-                \ "Also equals to '" . join(item["opt"][1:-1], "','") . "'"
-        endif
+        " append the opt[1:-1] as shortname
+        if (len(l:item['opt']) > 1)
+            for l:it in l:item['opt'][1:-1]
+                let s:popset_opt_shortname[l:it] = l:item['opt'][0]
+            endfor
+        end
     endfor
 
-    " convert internal option list to string for search with matchstr
-    "let l:lst_string = '|' . join(l:lst, '|') . '|'
+    " generate user's option data
+    if exists('g:Popset_SelectionData')
+        for l:item in g:Popset_SelectionData
+            " add option to popset_data
+            call s:addSelectionsAndCommand(l:item['opt'][0], l:item['lst'], l:item['dic'], l:item['cmd'])
 
-    if exists("g:Popset_SelectionData")
-        " add the non-reduplicated user's option to list
-        for item in g:Popset_SelectionData
-            " detect whether user's option in 'item' is reduplicated
-            let l:flg = 0
-            let l:dsr = []
-            let l:key = ""
-            for str in item["opt"]
-                " if internal list had not include user's option yet
-                "if "" == matchstr(l:lst_string, '\C|' . str . '|')
-                if -1 == match(l:lst, '\C^' . str . '$')
-                    " note the non-reduplicated option
-                    call add(l:dsr, str)
-                else
-                    " note the reduplicate option
-                    let l:flg = 1
-                    if -1 != match(l:lst_final, '\C^' . str . '$')
-                        let l:key = str
-                    endif
-                endif
-            endfor
-
-            if 0 == l:flg
-                " no reduplicated option in 'item' compared to internal option
-                call add(l:lst_final, item["opt"][0])
-                if len(item["opt"]) > 1
-                    let l:dic_final[item["opt"][0]] =
-                        \ "Also equals to '" . join(item["opt"][1:-1], "','") . "'"
-                endif
-            else
-                " the option 'item' is reduplicated
-                if !empty(l:dsr) && l:key != ""
-                    let l:dic_final[l:key] .= ",'" . join(l:dsr, "','") . "'"
-                endif
-            endif
+            " append the opt[1:-1] as shortname
+            if (len(l:item['opt']) > 1)
+                for l:it in l:item['opt'][1:-1]
+                    let s:popset_opt_shortname[l:it] = l:item['opt'][0]
+                endfor
+            end
         endfor
     endif
-    let s:popset_selection_data[0]["lst"] = l:lst_final
-    let s:popset_selection_data[0]["dic"] = l:dic_final
+endfunction
+" }}}
+
+" FUNCTION: s:createPopsetOption() {{{
+function! s:createPopsetOption()
+    "  create 'popset' option
+    let l:opt = 'popset'
+    let l:lst = keys(s:popset_data)
+    let l:cmd = 'popset#data#SetPopsetOption'
+    call sort(l:lst)
+    call s:addSelectionsAndCommand(l:opt, l:lst, {}, l:cmd)
 endfunction
 " }}}
 
@@ -150,10 +124,10 @@ function! popset#data#GetOptionValue(sopt, scmd)
             return g:colors_name
         endif
     endif
-
     return ""
 endfunction
 " }}}
+
 
 " SECTION: popset selection functions {{{1
 
@@ -189,6 +163,7 @@ function! popset#data#GetFileList(pat)
 endfunction
 " }}}
 
+
 " SECTION: popset selection data {{{1
 " s:popset_selection_data item format
 " \{
@@ -197,14 +172,9 @@ endfunction
 "     \ 'dic' : {},
 "     \ 'cmd' : '',
 " \},
-" attention!!!: "popset" must be in s:popset_selection_data[0]
+" "opt[0]" should be fullname of the option, and opt[1:-1] is the shortname for opt[0].
+" Think two options as same option when "opt[0]" is equal.
 let s:popset_selection_data = [
-    \{
-        \ 'opt' : ['popset'],
-        \ 'lst' : [],
-        \ 'dic' : {},
-        \ 'cmd' : 'popset#data#SetPopsetOption'
-    \},
     \{
         \ 'opt' : ['background', 'bg'],
         \ 'lst' : ['dark', 'light'],
