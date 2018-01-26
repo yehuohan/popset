@@ -81,6 +81,7 @@ let g:Popset_SelectionData = [
     \{
         \ "opt" : ["filetype", "ft"],
         \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
+        \ "dsr" : 'When this option is set, the FileType autocommand event is triggered.',
         \ "dic" : {
                 \ "python" : "python script file",
                 \ "vim": "Vim script file",
@@ -105,6 +106,9 @@ endfunction
     - `cmd`(necessary):
 `cmd` is the function which must execute with `opt` and `lst` args. In the example code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Of course, the `arg` can be any type(string, list, dictetory and so on) you want.
 
+    - `dsr`(not necessary):
+`dsr` is the description of `opt`, which will be taken as the `lst` of the popset option.
+
 
  - Show all the surpported options of popset:
 
@@ -124,6 +128,7 @@ All the surpported options is according to help-doc of vim8.0.
 The `dictionary` is similar to g:Popset_SelectionData. Another example:
 
 ```vim
+" dsr is ignored here for it's not necessary.
 let g:profile = 
     \{
         \ "opt" : ["Which file is your want?"],

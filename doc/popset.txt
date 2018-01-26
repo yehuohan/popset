@@ -138,6 +138,7 @@ PopSelection(`dictionary,` `flag)` is used to pop selections with given a
 `dictionary` and a `flag.`
 A `dictionary` example: >
 
+    " dsr is ignored here for it's not necessary.
     let g:profile = 
         \{
             \ "opt" : ["Which file is your want?"],
@@ -179,6 +180,7 @@ example code in .vimrc: >
     let g:Popset_SelectionData = [
         \{
             \ "opt" : ["filetype", "ft"],
+            \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
             \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
             \ "dic" : {
                     \ "python" : "python script file",
@@ -208,6 +210,9 @@ the `lst` and `dic` of different options.
 `lst` args. In the example code, for example, the `g:SetEqual` will function
 as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Of course,
 the `arg` can be any type(string, list, dictetory and so on) you want.
+
+`dsr`(not necessary): `dsr` is the description of `opt`, which will be taken
+as the `lst` of the popset option.
 
                                                                     |popset-toc|
 

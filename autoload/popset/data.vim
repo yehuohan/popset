@@ -6,6 +6,8 @@
 "  ......
 " }
 let s:popset_data = {}
+" contain all fullname and description
+let s:popset_opt_dsr = {}
 " map shortname to fullname
 let s:popset_opt_shortname = {}
 
@@ -15,6 +17,7 @@ let s:popset_opt_shortname = {}
 " FUNCTION: popset#data#Init() {{{
 function! popset#data#Init()
     let s:popset_data = {}
+    let s:popset_opt_dsr = {}
     let s:popset_opt_shortname = {}
 
     " generate option data
@@ -60,14 +63,15 @@ function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: s:addSelectionsAndCommand(sopt, slist, sdict, scmd) {{{
-function! s:addSelectionsAndCommand(sopt, slist, sdict, scmd)
+" FUNCTION: s:addSelectionsAndCommand(sopt, sdsr, slist, sdict, scmd) {{{
+function! s:addSelectionsAndCommand(sopt, sdsr, slist, sdict, scmd)
     " detect whether user's option is reduplicated
     if has_key(s:popset_data, a:sopt)
         call extend(s:popset_data[a:sopt][0], a:slist)
         call extend(s:popset_data[a:sopt][1], a:sdict, 'force')
     else
         let s:popset_data[a:sopt] = [a:slist, a:sdict, a:scmd]
+        let s:popset_opt_dsr[a:sopt] = a:sdsr
     endif
 endfunction
 " }}}
@@ -75,9 +79,9 @@ endfunction
 " FUNCTION: s:getSurpportedOptionData() {{{
 function! s:getSurpportedOptionData()
     " generate internal option data
-    for l:item in s:popset_selection_data[1:-1]
+    for l:item in s:popset_selection_data
         " add option to popset_data
-        call s:addSelectionsAndCommand(l:item['opt'][0], l:item['lst'], l:item['dic'], l:item['cmd'])
+        call s:addSelectionsAndCommand(l:item['opt'][0], l:item['dsr'], l:item['lst'], l:item['dic'], l:item['cmd'])
 
         " append the opt[1:-1] as shortname
         if (len(l:item['opt']) > 1)
@@ -91,7 +95,9 @@ function! s:getSurpportedOptionData()
     if exists('g:Popset_SelectionData')
         for l:item in g:Popset_SelectionData
             " add option to popset_data
-            call s:addSelectionsAndCommand(l:item['opt'][0], l:item['lst'], l:item['dic'], l:item['cmd'])
+            let l:dsr = has_key(l:item, 'dsr') ? l:item['dsr'] : ''
+            let l:dic = has_key(l:item, 'dic') ? l:item['dic'] : {}
+            call s:addSelectionsAndCommand(l:item['opt'][0], l:dsr, l:item['lst'], l:dic, l:item['cmd'])
 
             " append the opt[1:-1] as shortname
             if (len(l:item['opt']) > 1)
@@ -111,7 +117,7 @@ function! s:createPopsetOption()
     let l:lst = keys(s:popset_data)
     let l:cmd = 'popset#data#SetPopsetOption'
     call sort(l:lst)
-    call s:addSelectionsAndCommand(l:opt, l:lst, {}, l:cmd)
+    let s:popset_data[l:opt] = [l:lst, s:popset_opt_dsr, l:cmd]
 endfunction
 " }}}
 
@@ -168,6 +174,7 @@ endfunction
 " s:popset_selection_data item format
 " \{
 "     \ 'opt' : [],
+"     \ 'dsr' : '',
 "     \ 'lst' : [],
 "     \ 'dic' : {},
 "     \ 'cmd' : '',
@@ -177,6 +184,7 @@ endfunction
 let s:popset_selection_data = [
     \{
         \ 'opt' : ['background', 'bg'],
+        \ 'dsr' : 'Use color for the background.',
         \ 'lst' : ['dark', 'light'],
         \ 'dic' : {'data': 'dark background color',
                  \ 'ligth': 'light background color'},
@@ -184,12 +192,14 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['colorscheme', 'colo'],
+        \ 'dsr' : 'Load color scheme.',
         \ 'lst' : popset#data#GetFileList($VIMRUNTIME.'/colors/*.vim'),
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetExecute',
     \},
     \{
         \ 'opt' : ['completeopt', 'cot'],
+        \ 'dsr' : 'A comma separated list of options for Insert mode completion.',
         \ 'lst' : ['menu', 'menuone', 'longest',
                 \ 'menu,preview', 'menuone,preview',
                 \ 'menu,noinsert', 'menuone,noinsert',
@@ -209,6 +219,7 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['conceallevel', 'cole'],
+        \ 'dsr' : 'Determine how text shown.',
         \ 'lst' : ['0', '1', '2', '3'],
         \ 'dic' : {
                 \ '0' : 'Text is shown normally',
@@ -220,7 +231,8 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['encoding', 'enc'],
-        \ 'lst' : [ "latin1", 'utf-8', 'cp936', 'euc-cn', 'cp950',
+        \ 'dsr' : 'Sets the character encoding used inside Vim.',
+        \ 'lst' : [ 'latin1', 'utf-8', 'cp936', 'euc-cn', 'cp950',
                 \ 'big5', 'euc-tw', 'cp932', 'euc-jp', 'sjis',
                 \ 'cp949', 'euc-kr', 'koi8-r', 'koi8-u',
                 \ 'ucs-2be', 'ucs-2le', 'utf-16', 'utf-16le',
@@ -249,6 +261,7 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['fileencoding', 'fenc'],
+        \ 'dsr' : 'Sets the character encoding for the file of this buffer.',
         \ 'lst' : [ 'latin1', 'utf-8', 'cp936', 'euc-cn', 'cp950',
                 \ 'big5', 'euc-tw', 'cp932', 'euc-jp', 'sjis',
                 \ 'cp949', 'euc-kr', 'koi8-r', 'koi8-u',
@@ -278,6 +291,7 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['fileformat', 'ff'],
+        \ 'dsr' : 'Give the <EOL> of the current buffer.',
         \ 'lst' : ['dos', 'unix', 'mac'],
         \ 'dic' : {'dos' : 'set EOL to <CR><LF>',
                  \ 'unix' : 'set EOL to <LF>',
@@ -286,12 +300,14 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['foldcolumn', 'fdc'],
+        \ 'dsr' : 'Column indicates open and closed folds.',
         \ 'lst' : ['0', '1', '2' , '3', '4' , '5', '6', '7', '8', '9', '10', '11', '12'],
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
         \ 'opt' : ['foldmethod', 'fdm'],
+        \ 'dsr' : 'The kind of folding used for the current window.',
         \ 'lst' : ['manual', 'indent', 'expr', 'marker', 'syntax', 'diff'],
         \ 'dic' : {
                 \ 'manual' : 'Folds are created manually.',
@@ -305,6 +321,7 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['laststatus', 'ls'],
+        \ 'dsr' : 'Determine when the last window will have a status line.',
         \ 'lst' : ['0', '1', '2'],
         \ 'dic' :{
                 \ '0' : 'never',
@@ -315,18 +332,21 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['linespace', 'lsp'],
+        \ 'dsr' : 'Number of pixel lines inserted between characters.',
         \ 'lst' : ['-2', '-1', '0', '1', '2' , '3', '4' , '5', '6', '7', '8', '9', '10'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
         \ 'opt' : ['scrolloff', 'so'],
+        \ 'dsr' : 'Minimal number of screen lines to keep above and below the cursor.',
         \ 'lst' : ['0', '1', '2' , '3', '4' , '5', '6', '7', '8', '9', '10'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
         \ 'opt' : ['signcolumn', 'scl'],
+        \ 'dsr' : 'Whether or not to draw the signcolumn.',
         \ 'lst' : ['auto', 'yes', 'no'],
         \ 'dic' :{
                 \ 'auto' : 'only when there is a sign to display',
@@ -336,18 +356,21 @@ let s:popset_selection_data = [
     \},
     \{
         \ 'opt' : ['shiftwidth', 'sw'],
+        \ 'dsr' : 'Number of spaces to use for each step of (auto)indent.',
         \ 'lst' : ['2', '3', '4', '8'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
         \ 'opt' : ['tabstop', 'ts'],
+        \ 'dsr' : 'Number of spaces that a <Tab> in the file counts for.',
         \ 'lst' : ['2', '3', '4', '8'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
         \ 'opt' : ['virtualedit', 've'],
+        \ 'dsr' : 'Determine whether cursor can be positioned where there is no actual character.',
         \ 'lst' : ['""', 'block', 'insert', 'all', 'onemore'],
         \ 'dic' : {
                 \ '""'      : 'Default value.',
@@ -359,6 +382,4 @@ let s:popset_selection_data = [
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \]
-
-
 

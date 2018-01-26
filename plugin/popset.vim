@@ -22,6 +22,7 @@ call popset#init#Init()
 "                   \ "dic" : {},
 "                   \ "cmd" : "",
 "               }
+"               where dic is not necessary.
 " @param 2 preview: Is the command surpport preview.
 function! PopSelection(...)
     if a:0 == 0

@@ -77,10 +77,10 @@ endfunction
 
 " FUNCTION: popset#selection#SetOptionDict(dict) {{{
 function! popset#selection#SetOptionDict(dict, preview)
-    let s:selection_opt = a:dict["opt"][0]
-    let s:selection_lst = a:dict["lst"]
-    let s:selection_dic = a:dict["dic"]
-    let s:selection_cmd = a:dict["cmd"]
+    let s:selection_opt = a:dict['opt'][0]
+    let s:selection_lst = a:dict['lst']
+    let s:selection_dic = has_key(a:dict, 'dic') ? a:dict['dic'] : {}
+    let s:selection_cmd = a:dict['cmd']
     let s:selection_msg = s:selection_opt
     let s:selection_pre = a:preview
 
