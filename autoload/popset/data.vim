@@ -53,7 +53,7 @@ function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
     endif
 
     " search fullname
-    for l:key in s:popset_data['popset']['lst']
+    for l:key in keys(s:popset_data)
         if l:key =~ "^".a:arglead
             call add(l:completekeys, l:key)
         endif
