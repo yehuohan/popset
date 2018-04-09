@@ -48,9 +48,11 @@ function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
     let l:completekeys = []
 
     " search shortname
-    if has_key(s:popset_opt_shortname, a:arglead)
-        call add(l:completekeys, s:popset_opt_shortname[a:arglead])
-    endif
+    for l:key in keys(s:popset_opt_shortname)
+        if l:key =~ "^".a:arglead
+            call add(l:completekeys, s:popset_opt_shortname[l:key])
+        endif
+    endfor
 
     " search fullname
     for l:key in keys(s:popset_data)
