@@ -364,6 +364,13 @@ let s:popset_selection_data = [
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
+        \ 'opt' : ['softtabstop', 'sts'],
+        \ 'dsr' : 'Number of spaces that a <Tab> show.',
+        \ 'lst' : ['2', '3', '4', '8'],
+        \ 'dic' :{},
+        \ 'cmd' : 'popset#data#SetEqual',
+    \},
+    \{
         \ 'opt' : ['tabstop', 'ts'],
         \ 'dsr' : 'Number of spaces that a <Tab> in the file counts for.',
         \ 'lst' : ['2', '3', '4', '8'],
