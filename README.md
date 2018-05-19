@@ -94,23 +94,22 @@ function! g:SetEqual(sopt, arg)
 endfunction
 ```
 
-    `opt`(necessary):
-
+**`opt`(necessary):** 
 `opt` is the option name list. `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will think two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset will append the `lst` and `dic` (no `cmd`) but not override the existed one. Hence, the `opt` of options you add must be different to other `opt` of options, or you'll mix up the `lst` and `dic` of different options.
 
-    `lst`(necessary):
+**`lst`(necessary):**
 
 `lst` is the selection list of the `opt`.
 
-    `dic`(not necessary):
+**`dic`(not necessary):**
 
 `dic` is description of `lst` and `dic` can be empty.
 
-    `cmd`(necessary):
+**`cmd`(necessary):**
 
 `cmd` is the function which must execute with `opt` and `lst` args. In the example code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Of course, the `arg` can be any type(string, list, dictetory and so on) you want.
 
-    `dsr`(not necessary):
+**`dsr`(not necessary):**
 
 `dsr` is the description of `opt`, which will be taken as the `lst` of the popset option.
 
@@ -148,7 +147,8 @@ function! g:SetEcho(sopt, arg)
 endfunction
 ```
 
-The `flag` indicate whether previewing result of executing `cmd` is allowd or not. `flag` can be ignored and the default value for `flag` is 1.
+The `flag` indicate whether previewing result of executing `cmd` is allowd or not. `flag` can be ignored and the default value for `flag` is 0.
+
 Following is the example showing how to call `PopSelection()`.
 
 ```vim
