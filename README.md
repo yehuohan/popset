@@ -63,7 +63,7 @@ k       : Move the selection bar up
 <C-j>   : Move the selection bar one screen down
 <C-k>   : Move the selection bar one screen up
 <CR>    : Load the selection
-<Space> : Preview the selection
+<Space> : Preview or pre-execute the selection
 ?       : Show Help
 ```
 
