@@ -23,13 +23,14 @@ call popset#init#Init()
 "                   \ "cmd" : "",
 "               }
 "               where dic is not necessary.
-" @param 2 preview: Is the command surpport preview.
-function! PopSelection(...)
-    if a:0 == 0
-        return
+" @param 2 preview: Is the command surpport preview or not.
+" @param 3 args: The args list to cmd.
+function! PopSelection(dict, ...)
+    let l:preview = (a:0 >= 1) ? a:1 : 0
+    if (a:0 >= 2)
+        call popset#selection#SetOptionDict(a:dict, l:preview, 1, a:2)
+    else
+        call popset#selection#SetOptionDict(a:dict, l:preview, 0, [])
     endif
-    let l:dict = a:1
-    let l:preview = (a:0 >= 2) ? a:2 : 0
-    call popset#selection#SetOptionDict(l:dict, l:preview)
 endfunction
 " }}}

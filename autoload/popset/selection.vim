@@ -2,18 +2,14 @@
 " SECTION: variables {{{1
 
 " Set all the following selection_* variables before call function of pop.vim
-" what option to set
-let s:selection_opt = ""
-" what selections to choose for option
-let s:selection_lst = []
-" what information to show for selections
-let s:selection_dic = {}
-" what command to execute for selected selection
-let s:selection_cmd = ""
-" what message to show in status line
-let s:selection_msg = ""
-" whether allow preview
-let s:selection_pre = 1
+let s:selection_opt = ""            " what option to set
+let s:selection_lst = []            " what selections to choose for option
+let s:selection_dic = {}            " what information to show for selections
+let s:selection_cmd = ""            " what command to execute for selected selection
+let s:selection_cmd_args = []       " the command extra args
+let s:selection_cmd_args_flag = 0   " the command extra args flag
+let s:selection_msg = ""            " what message to show in status line
+let s:selection_pre = 1             " whether allow preview
 
 
 " SETCION: functions {{{1
@@ -42,6 +38,18 @@ function! popset#selection#SelectionCommand()
 endfunction
 " }}}
 
+" FUNCTION: popset#selection#SeletionCommandArgsFlag() {{{
+function! popset#selection#SeletionCommandArgsFlag()
+    return s:selection_cmd_args_flag
+endfunction
+"}}}
+
+" FUNCTION: popset#selection#SeletionCommandArgs() {{{
+function! popset#selection#SeletionCommandArgs()
+    return s:selection_cmd_args
+endfunction
+"}}}
+
 " FUNCTION: popset#selection#SelectionMessage() {{{
 function! popset#selection#SelectionMessage()
     return s:selection_msg
@@ -55,10 +63,12 @@ endfunction
 " }}}
 
 " FUNCTION: popset#selection#SetOption() {{{
-function! popset#selection#SetOption(psoption) 
+" psoption: the option in data.vim
+function! popset#selection#SetOption(psoption)
     let s:selection_opt = a:psoption
     let [s:selection_lst, s:selection_dic, s:selection_cmd] = popset#data#GetSelectionsAndCommand(a:psoption)
-    let s:selection_pre = ("popset" == popset#selection#SelectionOption()) ? 0 : 1
+    let s:selection_cmd_args_flag = 0
+    let s:selection_pre = ("popset" == s:selection_opt) ? 0 : 1
 
     if (empty(s:selection_lst) || s:selection_cmd == "")
         echo "'" . a:psoption "' is not surpported at present!"
@@ -76,11 +86,24 @@ endfunction
 " }}}
 
 " FUNCTION: popset#selection#SetOptionDict(dict) {{{
-function! popset#selection#SetOptionDict(dict, preview)
+" @param dict: A dictionary in followint format,
+"               {
+"                   \ "opt" : [],
+"                   \ "lst" : [],
+"                   \ "dic" : {},
+"                   \ "cmd" : "",
+"               }
+"               where dic is not necessary.
+" @param preview: Is the command surpport preview or not.
+" @param flag: Have extra args or not.
+" @param args: The args list to cmd.
+function! popset#selection#SetOptionDict(dict, preview, flg, args) 
     let s:selection_opt = a:dict['opt'][0]
     let s:selection_lst = a:dict['lst']
     let s:selection_dic = has_key(a:dict, 'dic') ? a:dict['dic'] : {}
     let s:selection_cmd = a:dict['cmd']
+    let s:selection_cmd_args_flag = a:flg
+    let s:selection_cmd_args = a:args
     let s:selection_msg = s:selection_opt
     let s:selection_pre = a:preview
 

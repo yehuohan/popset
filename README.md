@@ -129,7 +129,8 @@ All the surpported options is according to help-doc of vim8.0.
 
 <h3 id="4.1">PopSelection</h3>
 
-`PopSelection(dictionary, flag)` is used to pop selections with given a `dictionary` and a `flag`.
+`PopSelection(dictionary, flag, [args])` is used to pop selections with given `dictionary`, `flag` and optional `args`.
+
 The `dictionary` is similar to g:Popset_SelectionData. Another example:
 
 ```vim
@@ -143,17 +144,20 @@ let g:profile =
                 \ },
         \ "cmd" : "g:SetEcho",
     \}
-function! g:SetEcho(sopt, arg)
-    echo  a:arg
+function! g:SetEcho(sopt, arg, exargs)
+    echo  a:arg . a:exargs[0]
 endfunction
 ```
 
-The `flag` indicate whether previewing result of executing `cmd` is allowd or not. `flag` can be ignored and the default value for `flag` is 1.
+The `flag` indicate whether previewing result of executing `cmd` is allowd or not. `flag` can be ignored and the default value for `flag` is 0.
+
+The `args` is the extra arguments in list to `cmd`, which is optional.
+
 Following is the example showing how to call `PopSelection()`.
 
 ```vim
 call PopSelection(g:Popset_SelectionData[0])
-call PopSelection(g:profile, 1)
+call PopSelection(g:profile, 1, ['This is extra arguments'])
 ```
 
 ---

@@ -135,7 +135,11 @@ function! popset#pop#ApplySelection()
     let l:sel = popset#selection#SelectionList()[line(".") - 1]
     let l:Cmd = function(popset#selection#SelectionCommand())
     call popset#pop#Quit()
-    call l:Cmd(l:opt,l:sel)
+    if popset#selection#SeletionCommandArgsFlag()
+        call l:Cmd(l:opt,l:sel, popset#selection#SeletionCommandArgs())
+    else
+        call l:Cmd(l:opt,l:sel)
+    endif
 endfunction
 " }}}
 
