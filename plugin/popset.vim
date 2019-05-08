@@ -1,6 +1,6 @@
 " Popset: Pop selections for vim option settings.
 " Maintainer: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-" Version: 1.0.0
+" Version: 2.0.0
 "
 
 " SETCION: vim-script {{{1
@@ -9,12 +9,12 @@ if exists("g:popset_loaded")
 endif
 
 let g:popset_loaded = 1
+let g:Popc_layerInit    = {'Popset': 'popset#set#Init'}
+"let g:Popc_layerComMaps = {'Popset' : ['popset#set#Pop', 'p']}
 
-call popset#init#Init()
+command! -nargs=+ -complete=customlist,popset#data#GetOptionList PSet :call popset#set#PSet(<f-args>)
 
-
-" SETCION: functions {{{1
-" FUNCTION: PopSelection(dict, preview) {{{
+" FUNCTION: PopSelection(dict, ...) {{{
 " @param 1 dict: A dictionary in followint format,
 "               {
 "                   \ "opt" : [],
@@ -28,9 +28,9 @@ call popset#init#Init()
 function! PopSelection(dict, ...)
     let l:preview = (a:0 >= 1) ? a:1 : 0
     if (a:0 >= 2)
-        call popset#selection#SetOptionDict(a:dict, l:preview, 1, a:2)
+        call popset#set#PopSelection(a:dict, l:preview, a:2)
     else
-        call popset#selection#SetOptionDict(a:dict, l:preview, 0, [])
+        call popset#set#PopSelection(a:dict, l:preview, [])
     endif
 endfunction
 " }}}

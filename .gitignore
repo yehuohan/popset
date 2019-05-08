@@ -11,5 +11,5 @@
 !/*.gif
 !/LICENSE
 !/autoload
-!/doc
+!/doc/*.txt
 !/plugin

@@ -6,62 +6,21 @@
 "  ......
 " }
 let s:popset_data = {}
-" contain all fullname and description
-let s:popset_opt_dsr = {}
-" map shortname to fullname
-let s:popset_opt_shortname = {}
+let s:popset_opt_dsr = {}               " contain all fullname and description
+let s:popset_opt_shortname = {}         " map shortname to fullname
 
 
 " SETCION: functions {{{1
 
 " FUNCTION: popset#data#Init() {{{
 function! popset#data#Init()
-    let s:popset_data = {}
-    let s:popset_opt_dsr = {}
-    let s:popset_opt_shortname = {}
+    if exists('s:inited')
+        return
+    endif
+    let s:inited = 1
 
     " generate option data
-    call s:getSurpportedOptionData()
-    call s:createPopsetOption()
-endfunction
-" }}}
-
-" FUNCTION: popset#data#GetSelectionsAndCommand(sopt) {{{
-" return [list, dict, cmd]
-function! popset#data#GetSelectionsAndCommand(sopt)
-    " option is given in shortname
-    if has_key(s:popset_opt_shortname, a:sopt)
-        return s:popset_data[s:popset_opt_shortname[a:sopt]]
-    endif
-    " option is given in fullname
-    if has_key(s:popset_data, a:sopt)
-        return s:popset_data[a:sopt]
-    else
-        return [[], {}, '']
-    endif
-endfunction
-" }}}
-
-" FUNCTION: popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos) {{{
-" get customelist for PSet complete
-function! popset#data#GetCompleteOptionList(arglead, cmdline, cursorpos)
-    let l:completekeys = []
-
-    " search shortname
-    for l:key in keys(s:popset_opt_shortname)
-        if l:key =~ "^".a:arglead
-            call add(l:completekeys, s:popset_opt_shortname[l:key])
-        endif
-    endfor
-
-    " search fullname
-    for l:key in keys(s:popset_data)
-        if l:key =~ "^".a:arglead
-            call add(l:completekeys, l:key)
-        endif
-    endfor
-
-    return l:completekeys
+    call s:createPopsetData()
 endfunction
 " }}}
 
@@ -78,8 +37,8 @@ function! s:addSelectionsAndCommand(sopt, sdsr, slist, sdict, scmd)
 endfunction
 " }}}
 
-" FUNCTION: s:getSurpportedOptionData() {{{
-function! s:getSurpportedOptionData()
+" FUNCTION: s:createPopsetData() {{{
+function! s:createPopsetData()
     " generate internal option data
     for l:item in s:popset_selection_data
         " add option to popset_data
@@ -109,17 +68,52 @@ function! s:getSurpportedOptionData()
             end
         endfor
     endif
-endfunction
-" }}}
 
-" FUNCTION: s:createPopsetOption() {{{
-function! s:createPopsetOption()
     "  create 'popset' option
     let l:opt = 'popset'
     let l:lst = keys(s:popset_data)
-    let l:cmd = 'popset#data#SetPopsetOption'
+    let l:cmd = ''
     call sort(l:lst)
     let s:popset_data[l:opt] = [l:lst, s:popset_opt_dsr, l:cmd]
+endfunction
+" }}}
+
+" FUNCTION: popset#data#GetOption(sopt) {{{
+" return [list, dict, cmd]
+function! popset#data#GetOption(sopt)
+    " option is given in shortname
+    if has_key(s:popset_opt_shortname, a:sopt)
+        return s:popset_data[s:popset_opt_shortname[a:sopt]]
+    endif
+    " option is given in fullname
+    if has_key(s:popset_data, a:sopt)
+        return s:popset_data[a:sopt]
+    else
+        return [[], {}, '']
+    endif
+endfunction
+" }}}
+
+" FUNCTION: popset#data#GetOptionList(arglead, cmdline, cursorpos) {{{
+" get customelist for PSet complete
+function! popset#data#GetOptionList(arglead, cmdline, cursorpos)
+    let l:completekeys = []
+
+    " search shortname
+    for l:key in keys(s:popset_opt_shortname)
+        if l:key =~ "^".a:arglead
+            call add(l:completekeys, s:popset_opt_shortname[l:key])
+        endif
+    endfor
+
+    " search fullname
+    for l:key in keys(s:popset_data)
+        if l:key =~ "^".a:arglead
+            call add(l:completekeys, l:key)
+        endif
+    endfor
+
+    return l:completekeys
 endfunction
 " }}}
 
@@ -151,15 +145,8 @@ function! popset#data#SetExecute(sopt, arg)
 endfunction
 " }}}
 
-" FUNCTION: popset#data#SetPopsetOption(sopt, arg) {{{
-" set the option selected by popset
-function! popset#data#SetPopsetOption(sopt, arg)
-    call popset#selection#SetOption(a:arg)
-endfunction
-" }}}
-
-" FUNCTION: popset#data#GetFileList(pat) {{{
-function! popset#data#GetFileList(pat)
+" FUNCTION: s:getColorscheme(pat) {{{
+function! s:getColorscheme(pat)
     let l:scheme_path = split(glob(a:pat), "\n")
     let l:scheme_list = []
 
@@ -195,7 +182,7 @@ let s:popset_selection_data = [
     \{
         \ 'opt' : ['colorscheme', 'colo'],
         \ 'dsr' : 'Load color scheme.',
-        \ 'lst' : popset#data#GetFileList($VIMRUNTIME.'/colors/*.vim'),
+        \ 'lst' : s:getColorscheme($VIMRUNTIME.'/colors/*.vim'),
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetExecute',
     \},
@@ -256,7 +243,7 @@ let s:popset_selection_data = [
                 \ 'koi8-u'  : 'Ukrainian',
                 \ 'ucs-2be' : '16 bit UCS-2 encoded Unicode, big endian(ISO/IEC 10646-1)',
                 \ 'ucs-2le' : 'like ucs-2, little endian',
-                \ 'utf-16'	: 'ucs-2 extended with double-words for more characters',
+                \ 'utf-16'  : 'ucs-2 extended with double-words for more characters',
                 \ 'utf-16le': 'like utf-16, little endian',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
@@ -286,7 +273,7 @@ let s:popset_selection_data = [
                 \ 'koi8-u'  : 'Ukrainian',
                 \ 'ucs-2be' : '16 bit UCS-2 encoded Unicode, big endian(ISO/IEC 10646-1)',
                 \ 'ucs-2le' : 'like ucs-2, little endian',
-                \ 'utf-16'	: 'ucs-2 extended with double-words for more characters',
+                \ 'utf-16'  : 'ucs-2 extended with double-words for more characters',
                 \ 'utf-16le': 'like utf-16, little endian',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
