@@ -12,7 +12,7 @@
 
 **Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing some function and so on.
 
-**Popset** is inspired bySzymon Wrozynski plugin [vim-CtrlSpapce](https://github.com/vim-ctrlspace/vim-ctrlspace) and some plugin code of popset is based on vim-ctrlspace and Thanks a lot.
+**Popset** is a new implementation with [popc](https://github.com/yehuohan/popc). (The old implementation is in old-master branch)
 
 
 ---
@@ -22,6 +22,7 @@ For vim-plug, add to your `.vimrc`:
 
 ```vim
 Plug 'yehuohan/popset'
+Plug 'yehuohan/popc'
 ```
 
 ---
@@ -52,27 +53,6 @@ Example for `colorscheme`:
 :PSet colorscheme
 ```
 ![PopsetEx](popset2.gif)
-
-
-In popset view, you can use following command:
-
-```    
-q       : Quit pop selection
-j       : Move the selection bar down
-k       : Move the selection bar up
-<C-j>   : Move the selection bar one screen down
-<C-k>   : Move the selection bar one screen up
-<CR>    : Load the selection
-<Space> : Preview or pre-execute the selection
-?       : Show Help
-```
-
- - Set Completion of `PSet` by `g:Popset_CompleteAll`:
-
-```vim
-let g:Popset_CompleteAll = 1    " auto complete all command of vim
-let g:Popset_CompleteAll = 0    " auto complete commands surpported by popset
-```
 
  - Add your own selections by adding the following example code to `.vimrc`:
 
@@ -162,7 +142,7 @@ call PopSelection(g:profile, 1, ['This is extra arguments'])
 ---
 <h2 id="5">Help doc</h2>
 
-More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt)
+More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt) and [popc.txt](https://github.com/yehuohan/popc/blob/master/doc/popc.txt)
 
 ---
 <h2 id="6">Contributor</h2>
