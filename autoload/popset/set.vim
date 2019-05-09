@@ -64,6 +64,7 @@ function! s:pop()
 
     call s:lyr.setMode(s:MODE.Normal)
     call s:lyr.setInfo('centerText', l:text)
+    call s:lyr.setInfo('lastIndex', 0)
     call popc#ui#Create(s:lyr.name)
 endfunction
 " }}}
