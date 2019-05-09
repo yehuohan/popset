@@ -59,7 +59,7 @@ endfunction
 
 " FUNCTION: s:pop() {{{
 function! s:pop()
-    let l:value = popset#data#GetOptionValue(s:opt, s:cmd)
+    let l:value = popset#data#GetOptValue(s:opt, s:cmd)
     let l:text = s:opt . (empty(l:value) ? '' : ' = ' . l:value)
 
     call s:lyr.setMode(s:MODE.Normal)
@@ -73,7 +73,7 @@ function! popset#set#PSet(opt)
     call popset#data#Init()
 
     let s:opt = a:opt
-    let [s:lst, s:dic, s:cmd] = popset#data#GetOption(a:opt)
+    let [s:lst, s:dic, s:cmd] = popset#data#GetOpt(a:opt)
     let s:arg = []
     let s:pre = 1
 
@@ -117,7 +117,7 @@ function! popset#set#Load(key)
     let l:index = popc#ui#GetIndex()
 
     call popc#ui#Destroy()
-    if a:key ==# 'CR'
+    if (a:key ==# 'CR') || (a:key ==# 'Space' && s:pre)
         if s:opt ==# 'popset'
             call popset#set#PSet(s:lst[l:index])
         else
@@ -126,17 +126,9 @@ function! popset#set#Load(key)
             else
                 call function(s:cmd)(s:opt, s:lst[l:index], s:arg)
             endif
-        endif
-    elseif a:key ==# 'Space' && s:pre
-        if s:opt ==# 'popset'
-            call popset#set#PSet(s:lst[l:index])
-        else
-            if empty(s:arg)
-                call function(s:cmd)(s:opt, s:lst[l:index])
-            else
-                call function(s:cmd)(s:opt, s:lst[l:index], s:arg)
+            if a:key == 'Space'
+                call s:pop()
             endif
-            call s:pop()
         endif
     endif
 endfunction

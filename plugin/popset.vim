@@ -12,7 +12,7 @@ let g:popset_loaded = 1
 let g:Popc_layerInit    = {'Popset': 'popset#set#Init'}
 "let g:Popc_layerComMaps = {'Popset' : ['popset#set#Pop', 'p']}
 
-command! -nargs=+ -complete=customlist,popset#data#GetOptionList PSet :call popset#set#PSet(<f-args>)
+command! -nargs=+ -complete=customlist,popset#data#GetOptList PSet :call popset#set#PSet(<f-args>)
 
 " FUNCTION: PopSelection(dict, ...) {{{
 " @param 1 dict: A dictionary in followint format,
