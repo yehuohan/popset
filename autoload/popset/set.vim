@@ -1,5 +1,5 @@
 
-" set layer.
+" popset layer.
 
 " SECTION: variables {{{1
 let [s:popc, s:MODE] = popc#popc#GetPopc()
@@ -57,14 +57,16 @@ function! s:createBuffer()
 endfunction
 " }}}
 
-" FUNCTION: s:pop() {{{
-function! s:pop()
+" FUNCTION: s:pop(keepIndex) {{{
+function! s:pop(keepIndex)
     let l:value = popset#data#GetOptValue(s:opt, s:cmd)
     let l:text = s:opt . (empty(l:value) ? '' : ' = ' . l:value)
 
     call s:lyr.setMode(s:MODE.Normal)
     call s:lyr.setInfo('centerText', l:text)
-    call s:lyr.setInfo('lastIndex', 0)
+    if !a:keepIndex
+        call s:lyr.setInfo('lastIndex', 0)
+    endif
     call popc#ui#Create(s:lyr.name)
 endfunction
 " }}}
@@ -79,7 +81,7 @@ function! popset#set#PSet(opt)
     let s:pre = 1
 
     call s:createBuffer()
-    call s:pop()
+    call s:pop(0)
 endfunction
 " }}}
 
@@ -103,7 +105,7 @@ function! popset#set#PopSelection(dict, preview, args)
     let s:pre = a:preview
 
     call s:createBuffer()
-    call s:pop()
+    call s:pop(0)
 endfunction
 " }}}
 
@@ -128,7 +130,7 @@ function! popset#set#Load(key)
                 call function(s:cmd)(s:opt, s:lst[l:index], s:arg)
             endif
             if a:key == 'Space'
-                call s:pop()
+                call s:pop(1)
             endif
         endif
     endif
