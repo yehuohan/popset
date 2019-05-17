@@ -117,8 +117,11 @@ endfunction
 
 " FUNCTION: popset#set#Load(key) {{{
 function! popset#set#Load(key)
-    let l:index = popc#ui#GetIndex()
+    if empty(s:lst)
+        return
+    endif
 
+    let l:index = popc#ui#GetIndex()
     call popc#ui#Destroy()
     if (a:key ==# 'CR') || (a:key ==# 'Space' && s:pre)
         if s:opt ==# 'popset'
