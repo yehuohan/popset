@@ -1,6 +1,5 @@
 
  - [Installation](#1)
- - [Settings](#2)
  - [Command Usage](#3)
     - [PSet](#3.1)
  - [Function Usage](#4)
@@ -23,15 +22,6 @@ For vim-plug, add to your `.vimrc`:
 ```vim
 Plug 'yehuohan/popset'
 Plug 'yehuohan/popc'
-```
-
----
-<h2 id="2">Settings</h2>
-
- - Set `nocompatible` options:
-
-```vim
-set nocompatible
 ```
 
 ---
