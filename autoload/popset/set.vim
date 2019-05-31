@@ -77,7 +77,7 @@ function! popset#set#PSet(opt)
 
     let s:opt = a:opt
     let [s:lst, s:dic, s:cmd] = popset#data#GetOpt(a:opt)
-    let s:arg = []
+    unlet! s:arg
     let s:pre = 1
 
     call s:createBuffer()
@@ -85,7 +85,7 @@ function! popset#set#PSet(opt)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#PopSelection(dict, preview, args) {{{
+" FUNCTION: popset#set#PopSelection(dict, preview, ...) {{{
 " @param dict: A dictionary in followint format,
 "               {
 "                   \ "opt" : [],
@@ -95,13 +95,17 @@ endfunction
 "               }
 "               where dic is not necessary.
 " @param preview: Is the command surpport preview or not.
-" @param args: The args list to cmd.
-function! popset#set#PopSelection(dict, preview, args)
+" @param 1 args: The args list to cmd.
+function! popset#set#PopSelection(dict, preview, ...)
     let s:opt = a:dict['opt'][0]
     let s:lst = a:dict['lst']
     let s:dic = has_key(a:dict, 'dic') ? a:dict['dic'] : {}
     let s:cmd = a:dict['cmd']
-    let s:arg = a:args
+    if a:0 >= 1
+        let s:arg = a:1
+    else
+        unlet! s:arg
+    endif
     let s:pre = a:preview
 
     call s:createBuffer()
@@ -127,10 +131,10 @@ function! popset#set#Load(key)
         if s:opt ==# 'popset'
             call popset#set#PSet(s:lst[l:index])
         else
-            if empty(s:arg)
-                call function(s:cmd)(s:opt, s:lst[l:index])
-            else
+            if exists('s:arg')
                 call function(s:cmd)(s:opt, s:lst[l:index], s:arg)
+            else
+                call function(s:cmd)(s:opt, s:lst[l:index])
             endif
             if a:key == 'Space'
                 call s:pop(1)

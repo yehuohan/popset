@@ -1,6 +1,6 @@
 " Popset: Pop selections for vim option settings.
 " Maintainer: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-" Version: 2.0.0
+" Version: 2.0.1
 "
 
 " SETCION: vim-script {{{1
@@ -30,7 +30,7 @@ function! PopSelection(dict, ...)
     if (a:0 >= 2)
         call popset#set#PopSelection(a:dict, l:preview, a:2)
     else
-        call popset#set#PopSelection(a:dict, l:preview, [])
+        call popset#set#PopSelection(a:dict, l:preview)
     endif
 endfunction
 " }}}
