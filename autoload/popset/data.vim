@@ -230,7 +230,7 @@ let s:popset_selection_data = [
         \ 'dic' : {
                 \ 'latin1'  : 'Same as "ansi", 8-bit characters (ISO 8859-1, also used for cp1252).',
                 \ 'utf-8'   : '32 bit UTF-8 encoded Unicode (ISO/IEC 10646-1)',
-                \ 'cp936'   : 'simplified Chinese (Windows only)',
+                \ 'cp936'   : 'simplified Chinese (Windows only, GBK)',
                 \ 'euc-cn'  : 'simplified Chinese (Unix only)',
                 \ 'cp950'   : 'traditional Chinese (on Unix alias for big5)',
                 \ 'big5'    : 'traditional Chinese (on Windows alias for cp950)',
@@ -260,7 +260,7 @@ let s:popset_selection_data = [
         \ 'dic' : {
                 \ 'latin1'  : 'Same as "ansi", 8-bit characters (ISO 8859-1, also used for cp1252).',
                 \ 'utf-8'   : '32 bit UTF-8 encoded Unicode (ISO/IEC 10646-1)',
-                \ 'cp936'   : 'simplified Chinese (Windows only)',
+                \ 'cp936'   : 'simplified Chinese (Windows only, GBK)',
                 \ 'euc-cn'  : 'simplified Chinese (Unix only)',
                 \ 'cp950'   : 'traditional Chinese (on Unix alias for big5)',
                 \ 'big5'    : 'traditional Chinese (on Windows alias for cp950)',
