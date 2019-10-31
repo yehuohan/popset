@@ -12,7 +12,7 @@ let s:arg = []          " args of command
 let s:pre = 1           " preview
 let s:mapsData = [
     \ ['popset#set#Pop'   , ['p'],          'Pop popset layer'],
-    \ ['popset#set#Load'  , ['CR','Space'], 'Execute (CR-Execute, Space-Preview execute)'],
+    \ ['popset#set#Load'  , ['CR','Space'], 'Execute (CR-Execute, Space-Preview execution)'],
     \ ['popset#set#Help'  , ['?'],          'Show help of popset layer'],
     \ ]
 
@@ -126,8 +126,8 @@ function! popset#set#Load(key)
     endif
 
     let l:index = popc#ui#GetIndex()
-    call popc#ui#Destroy()
     if (a:key ==# 'CR') || (a:key ==# 'Space' && s:pre)
+        call popc#ui#Destroy()
         if s:opt ==# 'popset'
             call popset#set#PSet(s:lst[l:index])
         else
@@ -140,6 +140,8 @@ function! popset#set#Load(key)
                 call s:pop(1)
             endif
         endif
+    elseif a:key ==# 'Space' && !s:pre
+        call popc#ui#Msg('The execution does NOT support preview.')
     endif
 endfunction
 " }}}
