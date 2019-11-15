@@ -18,7 +18,7 @@ Table of Contents                                                   *popset-toc*
 2. Usage                                                          |popset-usage|
  2.1 Installation                                          |popset-installation|
 3. Command                                                      |popset-command|
- 3.1 PSet                                                                |:PSet|
+ 3.1 PopSet                                                            |:PopSet|
 4. Function                                                    |popset-function|
  4.1 PopSelection                                                 |PopSelection|
 5. License                                                      |popset-license|
@@ -38,8 +38,8 @@ Popset is inspired bySzymon Wrozynski plugin vim-CtrlSpapce and some plugin code
 2. Usage                                                          *popset-usage*
 
 The easiest way is using a plugin like vundle or vim-plug to install popset and
-use command :PSet to set vim options.
-You can also map keys you prefered to the command :Pset.
+use command :PopSet to set vim options.
+You can also map keys you prefered to the command :Popset.
 
                                                                     |popset-toc|
 
@@ -62,17 +62,18 @@ and call command PlugInstall.
                                                                     |popset-toc|
 
 --------------------------------------------------------------------------------
- 3.1 PSet                                                                *:PSet*
+ 3.1 PopSet                                                            *:PopSet*
 
-There is only one command PSet, which is similar to set command of vim, in 
-popset.  For example: >
+There is only one command PopSet, which is similar to set command, in popset.
+What can be set by PopSet is all in popset internal data.
+For example: >
 
-    :PSet foldmethod
+    :PopSet foldmethod
 <
 
 To see all the surpported options of popset: >
 
-    :PSet popset
+    :PopSet popset
 <
                                                                     |popset-toc|
 
@@ -85,32 +86,20 @@ To see all the surpported options of popset: >
 --------------------------------------------------------------------------------
  4.1 PopSelection                                                 *PopSelection*
 
+PopSelection(dict) is used to pop selections with given dict. The dict is
+similar to g:Popset_SelectionData, but belong to popset external data.
 
-PopSelection(`dictionary,` `flag)` is used to pop selections with given a
-`dictionary` and a `flag.`
-A `dictionary` example: >
+The dict must be in the format: >
 
-    " dsr is ignored here for it's not necessary.
-    let g:profile = 
-        \{
-            \ "opt" : ["Which file is your want?"],
-            \ "lst" : ["a.cpp", "b.vim", "c.md"]
-            \ "dic" : {
-                    \ "a.cpp" : "cpp file",
-                    \ },
-            \ "cmd" : "g:SetEcho",
-        \}
-    function! g:SetEcho(sopt, arg)
-        echo  a:arg
-    endfunction
-<
-
-The `flag` indicate whether previewing result of executing `cmd` is allowd or not.
-`flag` can be ignored and the default value for `flag` is 1.
-Following is the example showing how to call `PopSelection()` : >
-
-    call PopSelection(g:Popset_SelectionData[0])
-    call PopSelection(g:profile, 1)
+    let l:dict = {
+        \ 'opt' : [],
+        \ 'lst' : [],
+        \ 'dic' : {},
+        \ 'sub' : {},
+        \ 'cmd' : '',
+        \ 'pre' : 0,
+        \ 'arg' : []
+        \ }
 <
 
                                                                     |popset-toc|

@@ -73,7 +73,7 @@ function! s:createOpt()
     "  create 'popset' option
     let l:opt = 'popset'
     let l:lst = keys(s:popset_data)
-    let l:cmd = ''
+    let l:cmd = 'popset#set#SubPopSet'
     call sort(l:lst)
     let s:popset_data[l:opt] = [l:lst, s:popset_opt_dsr, l:cmd]
 endfunction
