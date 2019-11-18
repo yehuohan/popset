@@ -273,7 +273,7 @@ function! popset#set#PopSet(opt)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#PopSelection(dict, ...) {{{
+" FUNCTION: popset#set#PopSelection(dict) {{{
 " use for popset external data.
 function! popset#set#PopSelection(dict)
     call s:sel.clear()

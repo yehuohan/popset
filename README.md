@@ -33,13 +33,13 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
 
 Example for `foldmethod`:
 ```
-:PSet foldmethod
+:PopSet foldmethod
 ```
 ![PopsetEx](popset1.gif)
 
 Example for `colorscheme`:
 ```
-:PSet colorscheme
+:PopSet colorscheme
 ```
 ![PopsetEx](popset2.gif)
 
@@ -87,7 +87,7 @@ endfunction
  - Show all the surpported options of popset:
 
 ```vim
-:PSet popset
+:PopSet popset
 ```
 
 All the surpported options is according to help-doc of vim8.0.
