@@ -181,6 +181,13 @@ let s:popset_selection_data = [
         \ 'cmd' : 'popset#data#SetEqual',
     \},
     \{
+        \ 'opt' : ['cmdheight', 'ch'],
+        \ 'dsr' : 'Number of screen lines to use for the command-line.',
+        \ 'lst' : [1, 2, 3, 4, 5],
+        \ 'dic' : {},
+        \ 'cmd' : 'popset#data#SetEqual',
+    \},
+    \{
         \ 'opt' : ['colorscheme', 'colo'],
         \ 'dsr' : 'Load color scheme.',
         \ 'lst' : s:getColorscheme($VIMRUNTIME.'/colors/*.vim'),
