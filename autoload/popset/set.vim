@@ -202,7 +202,7 @@ endfunction
 " FUNCTION: popset#set#Help(key) {{{
 function! popset#set#Help(key)
     call s:lyr.setMode(s:MODE.Help)
-    call s:lyr.setBufs(v:t_string, len(s:mapsData), popc#layer#com#createHelpBuffer(s:mapsData))
+    call s:lyr.setBufs(v:t_string, len(s:mapsData), popc#utils#createHelpBuffer(s:mapsData))
     call popc#ui#Create(s:lyr.name)
 endfunction
 " }}}
