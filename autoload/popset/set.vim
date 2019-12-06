@@ -3,6 +3,7 @@
 
 " SECTION: variables {{{1
 let [s:popc, s:MODE] = popc#popc#GetPopc()
+let s:conf = popc#init#GetConfig()
 let s:lyr = {}          " this layer
 let s:sel = {
     \ 'stack' : [],
@@ -13,7 +14,6 @@ let s:lst = []          " list of selection
 let s:dic = {}          " dictionary of description
 let s:sub = {}          " sub selection
 let s:cmd = ''          " command function
-let s:pre = 0           " surpport preview or not
 let s:arg = []          " args of command
 let s:idx = 0           " current index of selection
 let s:mapsData = [
@@ -95,8 +95,9 @@ function! s:createBuffer()
     let l:max += 2
 
     " create and tabular buffer text
+    let l:val = popset#data#GetOptValue(s:opt, s:cmd)
     for lst in s:lst
-        let l:line = '  ' . lst
+        let l:line = '  ' . ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' ' . lst
         if has_key(s:dic, lst)
             " add description of selection if it exits
             let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
@@ -112,10 +113,7 @@ endfunction
 
 " FUNCTION: s:pop(keepIndex) {{{
 function! s:pop()
-    let l:value = popset#data#GetOptValue(s:opt, s:cmd)
-    let l:text = '[stack ' . string(s:sel.top) . '] '
-    let l:text .= s:opt . (empty(l:value) ? '' : ' = ' . l:value)
-
+    let l:text = 's' . string(s:sel.top) . '. ' . s:opt
     call s:lyr.setMode(s:MODE.Normal)
     call s:lyr.setInfo('centerText', l:text)
     call s:lyr.setInfo('lastIndex', s:idx)
@@ -131,7 +129,6 @@ endfunction
 "                   \ 'dic' : {},
 "                   \ 'sub' : {},
 "                   \ 'cmd' : '',
-"                   \ 'pre' : 0,
 "                   \ 'arg' : [],
 "                   \ 'idx' : 0,
 "               }
@@ -143,7 +140,6 @@ function! s:ps(sel)
     let s:dic = a:sel['dic']
     let s:sub = a:sel['sub']
     let s:cmd = a:sel['cmd']
-    let s:pre = a:sel['pre']
     if has_key(a:sel, 'arg')
         let s:arg = a:sel.arg
     else
@@ -169,18 +165,17 @@ function! popset#set#Load(key)
     endif
 
     let s:idx = popc#ui#GetIndex()
-    if (a:key ==# 'CR') || (a:key ==# 'Space' && s:pre)
-        call popc#ui#Destroy()
-        if exists('s:arg')
-            call function(s:cmd)(s:opt, s:lst[s:idx], s:arg)
-        else
-            call function(s:cmd)(s:opt, s:lst[s:idx])
+    call popc#ui#Destroy()
+    if exists('s:arg')
+        call function(s:cmd)(s:opt, s:lst[s:idx], s:arg)
+    else
+        call function(s:cmd)(s:opt, s:lst[s:idx])
+    endif
+    if a:key == 'Space'
+        if !empty(popset#data#GetOptValue(s:opt, s:cmd))
+            call s:createBuffer()
         endif
-        if a:key == 'Space'
-            call s:pop()
-        endif
-    elseif a:key ==# 'Space' && !s:pre
-        call popc#ui#Msg('The execution does NOT support preview.')
+        call s:pop()
     endif
 endfunction
 " }}}
@@ -218,7 +213,6 @@ function! popset#set#SubPopSet(sopt, arg)
     let l:sel = {
         \ 'opt' : a:arg,
         \ 'sub' : {},
-        \ 'pre' : 1,
         \ 'idx' : 0,
         \ }
     let [l:sel['lst'], l:sel['dic'], l:sel['cmd']] = popset#data#GetOpt(a:arg)
@@ -236,25 +230,21 @@ endfunction
 "                   \ 'dic' : {},
 "                   \ 'sub' : {},
 "                   \ 'cmd' : '',
-"                   \ 'pre' : 0,
 "                   \ 'arg' : [],
 "               }
 "               opt can NOT be empty,
-"               pre indicate the command surpport preview or not, default is 1.
 "               arg is the args list to cmd.
-"               dic, pre and arg is not necessary.
+"               dic and arg is not necessary.
 function! popset#set#SubPopSelection(sopt, arg)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : s:sub[a:arg]
     let l:sel = {
         \ 'dic' : {},
         \ 'sub' : {},
-        \ 'pre' : 1,
         \ 'idx' : 0,
         \ }
     call extend(l:sel, l:arg, 'force')
     let l:sel['opt'] = l:arg.opt[0]
     if l:sel['cmd'] ==# 'popset#set#SubPopSelection'
-        let l:sel['pre'] = 1
         if has_key(l:sel, 'arg')
             call remove(l:sel, 'arg')
         endif

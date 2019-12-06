@@ -123,7 +123,6 @@ let l:dict = {
     \ 'dic' : {},
     \ 'sub' : {},
     \ 'cmd' : '',
-    \ 'pre' : 0,
     \ 'arg' : []
     \ }
 ```
@@ -147,10 +146,6 @@ Similar to `dic` in `popset internal data`.
 **`cmd`(necessary):**
 
 Similar to `cmd` in `popset internal data`. Set `cmd` to `popset#set#SubPopSet` make sub selection. The sub selection is from `sub`.
-
-**`pre`(not necessary):**
-
-`pre` indicate the `cmd` surpport preview or not, default is 1.
 
 **`arg`(not necessary):**
 
