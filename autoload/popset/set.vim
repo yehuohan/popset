@@ -15,6 +15,7 @@ let s:dic = {}          " dictionary of description
 let s:sub = {}          " sub selection
 let s:cmd = ''          " command function
 let s:arg = []          " args of command
+let s:get = ''          " function to get option value
 let s:idx = 0           " current index of selection
 let s:mapsData = [
     \ ['popset#set#Pop'   , ['p'],          'Pop popset layer'],
@@ -92,12 +93,21 @@ function! s:createBuffer()
         let l:keywid = strwidth(lst)
         let l:max = (l:keywid > l:max) ? l:keywid : l:max
     endfor
-    let l:max += 2
 
     " create and tabular buffer text
-    let l:val = popset#data#GetOptValue(s:opt, s:cmd)
+    if !empty(s:get)
+        let l:val = function(s:get)(s:opt)
+        let l:max += 4
+    else
+        unlet! l:val
+        let l:max += 2
+    endif
     for lst in s:lst
-        let l:line = '  ' . ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' ' . lst
+        let l:line = '  '
+        if !empty(s:get)
+            let l:line .= ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' '
+        endif
+        let l:line .= lst
         if has_key(s:dic, lst)
             " add description of selection if it exits
             let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
@@ -130,9 +140,9 @@ endfunction
 "                   \ 'sub' : {},
 "                   \ 'cmd' : '',
 "                   \ 'arg' : [],
+"                   \ 'get' : '',
 "                   \ 'idx' : 0,
 "               }
-"               arg can be not existed,
 "               idx is current selection index.
 function! s:ps(sel)
     let s:opt = a:sel['opt']
@@ -145,6 +155,7 @@ function! s:ps(sel)
     else
         unlet! s:arg
     endif
+    let s:get = a:sel['get']
     let s:idx = a:sel['idx']            " recover selection's index
 
     call s:createBuffer()
@@ -172,7 +183,7 @@ function! popset#set#Load(key)
         call function(s:cmd)(s:opt, s:lst[s:idx])
     endif
     if a:key == 'Space'
-        if !empty(popset#data#GetOptValue(s:opt, s:cmd))
+        if !empty(s:get)
             call s:createBuffer()
         endif
         call s:pop()
@@ -215,7 +226,7 @@ function! popset#set#SubPopSet(sopt, arg)
         \ 'sub' : {},
         \ 'idx' : 0,
         \ }
-    let [l:sel['lst'], l:sel['dic'], l:sel['cmd']] = popset#data#GetOpt(a:arg)
+    let [l:sel['lst'], l:sel['dic'], l:sel['cmd'], l:sel['get']] = popset#data#GetOpt(a:arg)
     call s:sel.setTop('idx', s:idx)     " save upper selection's index
     call s:sel.push(l:sel)
     call s:ps(l:sel)
@@ -231,15 +242,17 @@ endfunction
 "                   \ 'sub' : {},
 "                   \ 'cmd' : '',
 "                   \ 'arg' : [],
+"                   \ 'get' : '',
 "               }
 "               opt can NOT be empty,
-"               arg is the args list to cmd.
-"               dic and arg is not necessary.
+"               arg MUST be NOT existed if no extra-args to cmd,
+"               dic, sub, arg and get is not necessary.
 function! popset#set#SubPopSelection(sopt, arg)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : s:sub[a:arg]
     let l:sel = {
         \ 'dic' : {},
         \ 'sub' : {},
+        \ 'get' : '',
         \ 'idx' : 0,
         \ }
     call extend(l:sel, l:arg, 'force')

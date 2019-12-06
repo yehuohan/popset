@@ -2,8 +2,8 @@
 " SECTION: variables {{{1
 " s:popset_data format
 " {
-"   opt1: [ [lst], {dic}, 'cmd'],
-"   opt2: [ [lst], {dic}, 'cmd'],
+"   opt1: [ [lst], {dic}, 'cmd', 'get'],
+"   opt2: [ [lst], {dic}, 'cmd', 'get'],
 "   ......
 " }
 let s:popset_data = {}
@@ -25,14 +25,14 @@ function! popset#data#Init()
 endfunction
 " }}}
 
-" FUNCTION: s:addOpt(sopt, sdsr, slist, sdict, scmd) {{{
-function! s:addOpt(sopt, sdsr, slist, sdict, scmd)
+" FUNCTION: s:addOpt(sopt, sdsr, slist, sdict, scmd, sget) {{{
+function! s:addOpt(sopt, sdsr, slist, sdict, scmd, sget)
     " detect whether user's option is reduplicated
     if has_key(s:popset_data, a:sopt)
         call extend(s:popset_data[a:sopt][0], a:slist)
         call extend(s:popset_data[a:sopt][1], a:sdict, 'force')
     else
-        let s:popset_data[a:sopt] = [a:slist, a:sdict, a:scmd]
+        let s:popset_data[a:sopt] = [a:slist, a:sdict, a:scmd, a:sget]
         let s:popset_opt_dsr[a:sopt] = a:sdsr
     endif
 endfunction
@@ -43,7 +43,12 @@ function! s:createOpt()
     " generate internal option data
     for l:item in s:popset_selection_data
         " add option to popset_data
-        call s:addOpt(l:item['opt'][0], l:item['dsr'], l:item['lst'], l:item['dic'], l:item['cmd'])
+        call s:addOpt(l:item['opt'][0],
+                    \ get(l:item, 'dsr', ''),
+                    \ l:item['lst'],
+                    \ get(l:item, 'dic', {}),
+                    \ l:item['cmd'],
+                    \ get(l:item, 'get', ''))
 
         " append the opt[1:-1] as shortname
         if (len(l:item['opt']) > 1)
@@ -57,9 +62,12 @@ function! s:createOpt()
     if exists('g:Popset_SelectionData')
         for l:item in g:Popset_SelectionData
             " add option to popset_data
-            let l:dsr = has_key(l:item, 'dsr') ? l:item['dsr'] : ''
-            let l:dic = has_key(l:item, 'dic') ? l:item['dic'] : {}
-            call s:addOpt(l:item['opt'][0], l:dsr, l:item['lst'], l:dic, l:item['cmd'])
+            call s:addOpt(l:item['opt'][0],
+                        \ get(l:item, 'dsr', ''),
+                        \ l:item['lst'],
+                        \ get(l:item, 'dic', {}),
+                        \ l:item['cmd'],
+                        \ get(l:item, 'get', ''))
 
             " append the opt[1:-1] as shortname
             if (len(l:item['opt']) > 1)
@@ -75,7 +83,7 @@ function! s:createOpt()
     let l:lst = keys(s:popset_data)
     let l:cmd = 'popset#set#SubPopSet'
     call sort(l:lst)
-    let s:popset_data[l:opt] = [l:lst, s:popset_opt_dsr, l:cmd]
+    let s:popset_data[l:opt] = [l:lst, s:popset_opt_dsr, l:cmd, '']
 endfunction
 " }}}
 
@@ -90,7 +98,7 @@ function! popset#data#GetOpt(sopt)
     if has_key(s:popset_data, a:sopt)
         return s:popset_data[a:sopt]
     else
-        return [[], {}, '']
+        return [[], {}, '', '']
     endif
 endfunction
 " }}}
@@ -115,19 +123,6 @@ function! popset#data#GetOptList(arglead, cmdline, cursorpos)
     endfor
 
     return l:completekeys
-endfunction
-" }}}
-
-" FUNCTION: popset#data#GetOptValue(sopt, scmd) {{{
-function! popset#data#GetOptValue(sopt, scmd)
-    if a:scmd ==# "popset#data#SetEqual"
-        return eval("&".a:sopt)
-    elseif a:scmd ==# "popset#data#SetExecute"
-        if a:sopt ==# "colorscheme" || a:sopt ==# "colo"
-            return g:colors_name
-        endif
-    endif
-    return ""
 endfunction
 " }}}
 
@@ -159,6 +154,20 @@ function! s:getColorscheme(pat)
 endfunction
 " }}}
 
+" FUNCTION: popset#data#GetOptValue(sopt) {{{
+function! popset#data#GetOptValue(sopt)
+    if has_key(s:popset_data, a:sopt) || has_key(s:popset_opt_shortname, a:sopt)
+        if a:sopt ==# "colorscheme" || a:sopt ==# "colo"
+            return g:colors_name
+        else
+            return eval("&".a:sopt)
+        endif
+    else
+        return ""
+    endif
+endfunction
+" }}}
+
 
 " SECTION: popset selection data {{{1
 " s:popset_selection_data item format
@@ -168,6 +177,7 @@ endfunction
 "     \ 'lst' : [],
 "     \ 'dic' : {},
 "     \ 'cmd' : '',
+"     \ 'get' : '',
 " \},
 " "opt[0]" should be fullname of the option, and opt[1:-1] is the shortname for opt[0].
 " Think two options as same option when "opt[0]" is equal.
@@ -179,6 +189,7 @@ let s:popset_selection_data = [
         \ 'dic' : {'data': 'dark background color',
                  \ 'ligth': 'light background color'},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['cmdheight', 'ch'],
@@ -186,6 +197,7 @@ let s:popset_selection_data = [
         \ 'lst' : [1, 2, 3, 4, 5],
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['colorscheme', 'colo'],
@@ -193,6 +205,7 @@ let s:popset_selection_data = [
         \ 'lst' : s:getColorscheme($VIMRUNTIME.'/colors/*.vim'),
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetExecute',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['completeopt', 'cot'],
@@ -213,6 +226,7 @@ let s:popset_selection_data = [
                 \ 'menuone,noselect' : 'Do not select a match in the menu, force the user to select one from the menu.',
                 \ },
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['conceallevel', 'cole'],
@@ -225,6 +239,7 @@ let s:popset_selection_data = [
                 \ '3' : 'Concealed text is completely hidden.',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['encoding', 'enc'],
@@ -255,6 +270,7 @@ let s:popset_selection_data = [
                 \ 'utf-16le': 'like utf-16, little endian',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['fileencoding', 'fenc'],
@@ -285,6 +301,7 @@ let s:popset_selection_data = [
                 \ 'utf-16le': 'like utf-16, little endian',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['fileformat', 'ff'],
@@ -294,6 +311,7 @@ let s:popset_selection_data = [
                  \ 'unix' : 'set EOL to <LF>',
                  \ 'mac' : 'set EOL to <CR>'},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['foldcolumn', 'fdc'],
@@ -301,6 +319,7 @@ let s:popset_selection_data = [
         \ 'lst' : ['0', '1', '2' , '3', '4' , '5', '6', '7', '8', '9', '10', '11', '12'],
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['foldmethod', 'fdm'],
@@ -315,6 +334,7 @@ let s:popset_selection_data = [
                 \ 'diff'   : 'Fold text that is not changed.',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['laststatus', 'ls'],
@@ -326,6 +346,7 @@ let s:popset_selection_data = [
                 \ '2' : 'always',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['linespace', 'lsp'],
@@ -333,6 +354,7 @@ let s:popset_selection_data = [
         \ 'lst' : ['-2', '-1', '0', '1', '2' , '3', '4' , '5', '6', '7', '8', '9', '10'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['scrolloff', 'so'],
@@ -340,6 +362,7 @@ let s:popset_selection_data = [
         \ 'lst' : ['0', '1', '2' , '3', '4' , '5', '6', '7', '8', '9', '10'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['signcolumn', 'scl'],
@@ -350,6 +373,7 @@ let s:popset_selection_data = [
                 \ 'no'   : 'never',
                 \ 'yes'  : 'always',},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['shiftwidth', 'sw'],
@@ -357,6 +381,7 @@ let s:popset_selection_data = [
         \ 'lst' : ['2', '3', '4', '8', '16'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['softtabstop', 'sts'],
@@ -364,6 +389,7 @@ let s:popset_selection_data = [
         \ 'lst' : ['2', '3', '4', '8', '16'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['tabstop', 'ts'],
@@ -371,6 +397,7 @@ let s:popset_selection_data = [
         \ 'lst' : ['2', '3', '4', '8', '16'],
         \ 'dic' :{},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \{
         \ 'opt' : ['virtualedit', 've'],
@@ -384,6 +411,7 @@ let s:popset_selection_data = [
                 \ 'onemore' : 'Allow the cursor to move just past the end of the line.',
                 \},
         \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue'
     \},
     \]
 

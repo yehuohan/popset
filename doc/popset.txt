@@ -97,7 +97,8 @@ The dict must be in the format: >
         \ 'dic' : {},
         \ 'sub' : {},
         \ 'cmd' : '',
-        \ 'arg' : []
+        \ 'arg' : [],
+        \ 'get' : '',
         \ }
 <
 

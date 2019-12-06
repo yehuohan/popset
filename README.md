@@ -49,23 +49,31 @@ Example for `colorscheme`:
 let g:Popset_SelectionData = [
     \{
         \ "opt" : ["filetype", "ft"],
-        \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
         \ "dsr" : 'When this option is set, the FileType autocommand event is triggered.',
+        \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
         \ "dic" : {
                 \ "python" : "python script file",
                 \ "vim": "Vim script file",
                 \ },
         \ "cmd" : "g:SetEqual",
+        \ "get" : "g:GetValue"
     \}
     \]
 function! g:SetEqual(sopt, arg)
     execute "set " . a:sopt . "=" . a:arg
+endfunction
+function! g:GetValue(sopt)
+    return eval("&".a:sopt)
 endfunction
 ```
 
 **`opt`(necessary):** 
 
 `opt` is the option name list. `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will think two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset will append the `lst` and `dic` (no `cmd`) but not override the existed one. Hence, the `opt` of options you add must be different to other `opt` of options, or you'll mix up the `lst` and `dic` of different options.
+
+**`dsr`(not necessary):**
+
+`dsr` is the description of `opt`, which will be taken as the `lst` of the popset option.
 
 **`lst`(necessary):**
 
@@ -79,10 +87,9 @@ endfunction
 
 `cmd` is the function which must execute with `opt` and `lst` args. In the example code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Of course, the `arg` can be any type(string, list, dictetory and so on) you want.
 
-**`dsr`(not necessary):**
+**`get`(not necessary):**
 
-`dsr` is the description of `opt`, which will be taken as the `lst` of the popset option.
-
+`get` is a function used to get the value of `opt`.
 
  - Show all the surpported options of popset:
 
@@ -123,7 +130,8 @@ let l:dict = {
     \ 'dic' : {},
     \ 'sub' : {},
     \ 'cmd' : '',
-    \ 'arg' : []
+    \ 'arg' : [],
+    \ 'get' : '',
     \ }
 ```
 
@@ -150,6 +158,10 @@ Similar to `cmd` in `popset internal data`. Set `cmd` to `popset#set#SubPopSet` 
 **`arg`(not necessary):**
 
 `arg` is the extra-args-list append to `cmd`. If `cmd` doesn't need extra-args-list, the `dict` must NOT contain the `arg` key.
+
+**`get`(not necessary):**
+
+Similar to `get` in `popset internal data`.
 
 A sub selection example:
 
