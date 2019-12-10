@@ -1,14 +1,15 @@
 
 " SECTION: variables {{{1
-" s:popset_data format
-" {
-"   opt1: [ [lst], {dic}, 'cmd', 'get'],
-"   opt2: [ [lst], {dic}, 'cmd', 'get'],
-"   ......
-" }
-let s:popset_data = {}
-let s:popset_opt_dsr = {}               " contain all fullname and description
 let s:popset_opt_shortname = {}         " map shortname to fullname
+let s:popset_sel = {
+    \ 'opt' : ['popset'],
+    \ 'lst' : [],
+    \ 'dic' : {},
+    \ 'sub' : {},
+    \ 'cpl' : 'customlist,popset#data#GetSelList',
+    \ 'cmd' : 'popset#set#SubPopSelection',
+    \ 'get' : ''
+    \ }
 
 
 " SETCION: functions {{{1
@@ -21,39 +22,23 @@ function! popset#data#Init()
     let s:inited = 1
 
     " generate option data
-    call s:createOpt()
+    call s:createSel()
 endfunction
 " }}}
 
-" FUNCTION: s:addOpt(sopt, sdsr, slist, sdict, scmd, sget) {{{
-function! s:addOpt(sopt, sdsr, slist, sdict, scmd, sget)
-    " detect whether user's option is reduplicated
-    if has_key(s:popset_data, a:sopt)
-        call extend(s:popset_data[a:sopt][0], a:slist)
-        call extend(s:popset_data[a:sopt][1], a:sdict, 'force')
-    else
-        let s:popset_data[a:sopt] = [a:slist, a:sdict, a:scmd, a:sget]
-        let s:popset_opt_dsr[a:sopt] = a:sdsr
-    endif
-endfunction
-" }}}
-
-" FUNCTION: s:createOpt() {{{
-function! s:createOpt()
+" FUNCTION: s:createSel() {{{
+function! s:createSel()
     " generate internal option data
     for l:item in s:popset_selection_data
-        " add option to popset_data
-        call s:addOpt(l:item['opt'][0],
-                    \ get(l:item, 'dsr', ''),
-                    \ l:item['lst'],
-                    \ get(l:item, 'dic', {}),
-                    \ l:item['cmd'],
-                    \ get(l:item, 'get', ''))
+        let l:sopt = l:item['opt'][0]
+        call add(s:popset_sel.lst, l:sopt)
+        let s:popset_sel.dic[l:sopt] = get(l:item, 'dsr', '')
+        let s:popset_sel.sub[l:sopt] = l:item
 
         " append the opt[1:-1] as shortname
         if (len(l:item['opt']) > 1)
             for l:it in l:item['opt'][1:-1]
-                let s:popset_opt_shortname[l:it] = l:item['opt'][0]
+                let s:popset_opt_shortname[l:it] = l:sopt
             endfor
         end
     endfor
@@ -61,51 +46,55 @@ function! s:createOpt()
     " generate user's option data
     if exists('g:Popset_SelectionData')
         for l:item in g:Popset_SelectionData
-            " add option to popset_data
-            call s:addOpt(l:item['opt'][0],
-                        \ get(l:item, 'dsr', ''),
-                        \ l:item['lst'],
-                        \ get(l:item, 'dic', {}),
-                        \ l:item['cmd'],
-                        \ get(l:item, 'get', ''))
+            let l:sopt = l:item['opt'][0]
+            if has_key(s:popset_sel.sub, l:sopt)
+                call extend(s:popset_sel.sub[l:sopt].lst, l:item.lst)
+                call extend(s:popset_sel.sub[l:sopt].dic, get(l:item, 'dic', {}), 'force')
+            else
+                call add(s:popset_sel.lst, l:sopt)
+                let s:popset_sel.dic[l:sopt] = get(l:item, 'dsr', '')
+                let s:popset_sel.sub[l:sopt] = l:item
+            endif
 
             " append the opt[1:-1] as shortname
             if (len(l:item['opt']) > 1)
                 for l:it in l:item['opt'][1:-1]
-                    let s:popset_opt_shortname[l:it] = l:item['opt'][0]
+                    let s:popset_opt_shortname[l:it] = l:sopt
                 endfor
             end
         endfor
     endif
 
-    "  create 'popset' option
-    let l:opt = 'popset'
-    let l:lst = keys(s:popset_data)
-    let l:cmd = 'popset#set#SubPopSet'
-    call sort(l:lst)
-    let s:popset_data[l:opt] = [l:lst, s:popset_opt_dsr, l:cmd, '']
+    call sort(s:popset_sel.lst)
 endfunction
 " }}}
 
-" FUNCTION: popset#data#GetOpt(sopt) {{{
-" return [list, dict, cmd]
-function! popset#data#GetOpt(sopt)
-    " option is given in shortname
-    if has_key(s:popset_opt_shortname, a:sopt)
-        return s:popset_data[s:popset_opt_shortname[a:sopt]]
-    endif
-    " option is given in fullname
-    if has_key(s:popset_data, a:sopt)
-        return s:popset_data[a:sopt]
+" FUNCTION: popset#data#GetSel(sopt) {{{
+function! popset#data#GetSel(sopt)
+    if a:sopt ==# 'popset'
+        return s:popset_sel
     else
-        return [[], {}, '', '']
+        " option is given in shortname
+        if has_key(s:popset_opt_shortname, a:sopt)
+            return s:popset_sel.sub[s:popset_opt_shortname[a:sopt]]
+        endif
+        " option is given in fullname
+        if has_key(s:popset_sel.sub, a:sopt)
+            return s:popset_sel.sub[a:sopt]
+        endif
     endif
+    let l:sel = {
+        \ 'opt' : [''],
+        \ 'lst' : [],
+        \ 'cmd' : '',
+        \ }
+    return l:sel
 endfunction
 " }}}
 
-" FUNCTION: popset#data#GetOptList(arglead, cmdline, cursorpos) {{{
-" get customelist for PSet complete
-function! popset#data#GetOptList(arglead, cmdline, cursorpos)
+" FUNCTION: popset#data#GetSelList(arglead, cmdline, cursorpos) {{{
+" get customelist for PopSet complete
+function! popset#data#GetSelList(arglead, cmdline, cursorpos)
     let l:completekeys = []
 
     " search shortname
@@ -116,11 +105,15 @@ function! popset#data#GetOptList(arglead, cmdline, cursorpos)
     endfor
 
     " search fullname
-    for l:key in keys(s:popset_data)
+    for l:key in s:popset_sel.lst
         if l:key =~ "^".a:arglead
             call add(l:completekeys, l:key)
         endif
     endfor
+
+    if "popset" =~ "^".a:arglead
+        call add(l:completekeys, "popset")
+    endif
 
     return l:completekeys
 endfunction
@@ -156,7 +149,7 @@ endfunction
 
 " FUNCTION: popset#data#GetOptValue(sopt) {{{
 function! popset#data#GetOptValue(sopt)
-    if has_key(s:popset_data, a:sopt) || has_key(s:popset_opt_shortname, a:sopt)
+    if has_key(s:popset_sel.sub, a:sopt) || has_key(s:popset_opt_shortname, a:sopt)
         if a:sopt ==# "colorscheme" || a:sopt ==# "colo"
             return g:colors_name
         else

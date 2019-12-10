@@ -167,6 +167,21 @@ function! s:ps(sel)
 endfunction
 " }}}
 
+" FUNCTION: popset#set#GetLstList(arglead, cmdline, cursorpos) {{{
+" get s:lst for completion
+function! popset#set#GetLstList(arglead, cmdline, cursorpos)
+    let l:completekeys = []
+
+    for l:key in s:lst
+        if l:key =~ "^".a:arglead
+            call add(l:completekeys, l:key)
+        endif
+    endfor
+
+    return l:completekeys
+endfunction
+" }}}
+
 " FUNCTION: popset#set#Pop(key) {{{
 function! popset#set#Pop(key)
     call popset#set#PopSet('popset')
@@ -203,7 +218,7 @@ function! popset#set#Input(key)
         let l:text = s:lst[s:idx]
     endif
     if empty(s:cpl)
-        let l:sval = popc#ui#Input('Input: ', l:text)
+        let l:sval = popc#ui#Input('Input: ', l:text, 'customlist,popset#set#GetLstList')
     else
         let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
     endif
@@ -244,24 +259,7 @@ endfunction
 
 " SECTION: api functions {{{1
 " All popset start from popset#set#PopSet or popset#set#PopSelection, so clear s:sel here.
-" All sub-popset start from popset#set#SubPopSet or popset#set#SubPopSelection, so push s:sel here.
-
-" FUNCTION: popset#set#SubPopSet(sopt, arg) {{{
-" @param arg: Internal popset data option name.
-function! popset#set#SubPopSet(sopt, arg)
-    call popset#data#Init()
-    let l:sel = {
-        \ 'opt' : a:arg,
-        \ 'sub' : {},
-        \ 'cpl' : '',
-        \ 'idx' : 0,
-        \ }
-    let [l:sel['lst'], l:sel['dic'], l:sel['cmd'], l:sel['get']] = popset#data#GetOpt(a:arg)
-    call s:sel.setTop('idx', s:idx)     " save upper selection's index
-    call s:sel.push(l:sel)
-    call s:ps(l:sel)
-endfunction
-" }}}
+" All sub-popset start from popset#set#SubPopSelection, so push s:sel here.
 
 " FUNCTION: popset#set#SubPopSelection(sopt, arg) {{{
 " @param arg: A dictionary in following format,
@@ -275,7 +273,7 @@ endfunction
 "                   \ 'arg' : [],
 "                   \ 'get' : '',
 "               }
-"               opt, lst and cmd is necessary, 
+"               opt, lst and cmd is necessary,
 "               dic, sub, arg, cpl and get is not necessary,
 "               arg MUST be NOT existed if no extra-args to cmd.
 function! popset#set#SubPopSelection(sopt, arg)
@@ -303,8 +301,9 @@ endfunction
 " FUNCTION: popset#set#PopSet(opt) {{{
 " use for popset internal data.
 function! popset#set#PopSet(opt)
+    call popset#data#Init()
     call s:sel.clear()
-    call popset#set#SubPopSet('popset', a:opt)
+    call popset#set#SubPopSelection('popset', popset#data#GetSel(a:opt))
 endfunction
 " }}}
 
