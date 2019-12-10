@@ -13,6 +13,7 @@ let s:opt = ''          " option name of selection
 let s:lst = []          " list of selection
 let s:dic = {}          " dictionary of description
 let s:sub = {}          " sub selection
+let s:cpl = ''          " completion for input
 let s:cmd = ''          " command function
 let s:arg = []          " args of command
 let s:get = ''          " function to get option value
@@ -20,6 +21,7 @@ let s:idx = 0           " current index of selection
 let s:mapsData = [
     \ ['popset#set#Pop'   , ['p'],          'Pop popset layer'],
     \ ['popset#set#Load'  , ['CR','Space'], 'Execute (Space: preview execution)'],
+    \ ['popset#set#Input' , ['i','I'],      'Input selection value'],
     \ ['popset#set#Back'  , ['u','U'],      'Back to upper selection (U: back to the root-upper selection)'],
     \ ['popset#set#Help'  , ['?'],          'Show help of popset layer'],
     \ ]
@@ -138,6 +140,7 @@ endfunction
 "                   \ 'lst' : [],
 "                   \ 'dic' : {},
 "                   \ 'sub' : {},
+"                   \ 'cpl' : '',
 "                   \ 'cmd' : '',
 "                   \ 'arg' : [],
 "                   \ 'get' : '',
@@ -149,6 +152,7 @@ function! s:ps(sel)
     let s:lst = a:sel['lst']
     let s:dic = a:sel['dic']
     let s:sub = a:sel['sub']
+    let s:cpl = a:sel['cpl']
     let s:cmd = a:sel['cmd']
     if has_key(a:sel, 'arg')
         let s:arg = a:sel.arg
@@ -182,11 +186,35 @@ function! popset#set#Load(key)
     else
         call function(s:cmd)(s:opt, s:lst[s:idx])
     endif
-    if a:key == 'Space'
+    if a:key ==# 'Space'
         if !empty(s:get)
             call s:createBuffer()
         endif
         call s:pop()
+    endif
+endfunction
+" }}}
+
+" FUNCTION: popset#set#Input(key) {{{
+function! popset#set#Input(key)
+    let l:text = ''
+    if a:key ==# 'I'
+        let s:idx = popc#ui#GetIndex()
+        let l:text = s:lst[s:idx]
+    endif
+    if empty(s:cpl)
+        let l:sval = popc#ui#Input('Input: ', l:text)
+    else
+        let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
+    endif
+    if empty(l:sval)
+        return
+    endif
+    call popc#ui#Destroy()
+    if exists('s:arg')
+        call function(s:cmd)(s:opt, l:sval, s:arg)
+    else
+        call function(s:cmd)(s:opt, l:sval)
     endif
 endfunction
 " }}}
@@ -225,6 +253,7 @@ function! popset#set#SubPopSet(sopt, arg)
     let l:sel = {
         \ 'opt' : a:arg,
         \ 'sub' : {},
+        \ 'cpl' : '',
         \ 'idx' : 0,
         \ }
     let [l:sel['lst'], l:sel['dic'], l:sel['cmd'], l:sel['get']] = popset#data#GetOpt(a:arg)
@@ -241,18 +270,20 @@ endfunction
 "                   \ 'lst' : [],
 "                   \ 'dic' : {},
 "                   \ 'sub' : {},
+"                   \ 'cpl' : '',
 "                   \ 'cmd' : '',
 "                   \ 'arg' : [],
 "                   \ 'get' : '',
 "               }
-"               opt can NOT be empty,
-"               arg MUST be NOT existed if no extra-args to cmd,
-"               dic, sub, arg and get is not necessary.
+"               opt, lst and cmd is necessary, 
+"               dic, sub, arg, cpl and get is not necessary,
+"               arg MUST be NOT existed if no extra-args to cmd.
 function! popset#set#SubPopSelection(sopt, arg)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : s:sub[a:arg]
     let l:sel = {
         \ 'dic' : {},
         \ 'sub' : {},
+        \ 'cpl' : '',
         \ 'get' : '',
         \ 'idx' : 0,
         \ }

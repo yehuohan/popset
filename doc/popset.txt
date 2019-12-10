@@ -96,6 +96,7 @@ The dict must be in the format: >
         \ 'lst' : [],
         \ 'dic' : {},
         \ 'sub' : {},
+        \ 'cpl' : '',
         \ 'cmd' : '',
         \ 'arg' : [],
         \ 'get' : '',

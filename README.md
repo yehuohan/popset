@@ -55,6 +55,7 @@ let g:Popset_SelectionData = [
                 \ "python" : "python script file",
                 \ "vim": "Vim script file",
                 \ },
+        \ "cpl" : 'filetype',
         \ "cmd" : "g:SetEqual",
         \ "get" : "g:GetValue"
     \}
@@ -82,6 +83,10 @@ endfunction
 **`dic`(not necessary):**
 
 `dic` is description of `lst` and `dic` can be empty.
+
+**`cpl`(not necessary):**
+
+`cpl` is completion for input selection value.
 
 **`cmd`(necessary):**
 
@@ -129,6 +134,7 @@ let l:dict = {
     \ 'lst' : [],
     \ 'dic' : {},
     \ 'sub' : {},
+    \ 'cpl' : '',
     \ 'cmd' : '',
     \ 'arg' : [],
     \ 'get' : '',
@@ -150,6 +156,10 @@ Similar to `dic` in `popset internal data`.
 **`sub`(not necessary):**
 
 `sub` is sub selection with key from `lst`. It's necessary if `cmd` is `popset#set#PopSelection`.
+
+**`cpl`(not necessary):**
+
+Similar to `cpl` in `popset internal data`.
 
 **`cmd`(necessary):**
 
