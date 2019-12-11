@@ -77,7 +77,7 @@ endfunction
 
 " FUNCTION: popset#set#Init() {{{
 function! popset#set#Init()
-    let s:lyr = s:popc.addLayer('Popset')
+    let s:lyr = s:popc.addLayer('Popset', 0)
 
     for md in s:mapsData
         call s:lyr.addMaps(md[0], md[1])
@@ -167,21 +167,6 @@ function! s:ps(sel)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#GetLstList(arglead, cmdline, cursorpos) {{{
-" get s:lst for completion
-function! popset#set#GetLstList(arglead, cmdline, cursorpos)
-    let l:completekeys = []
-
-    for l:key in s:lst
-        if l:key =~ "^".a:arglead
-            call add(l:completekeys, l:key)
-        endif
-    endfor
-
-    return l:completekeys
-endfunction
-" }}}
-
 " FUNCTION: popset#set#Pop(key) {{{
 function! popset#set#Pop(key)
     call popset#set#PopSet('popset')
@@ -217,11 +202,7 @@ function! popset#set#Input(key)
         let s:idx = popc#ui#GetIndex()
         let l:text = s:lst[s:idx]
     endif
-    if empty(s:cpl)
-        let l:sval = popc#ui#Input('Input: ', l:text, 'customlist,popset#set#GetLstList')
-    else
-        let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
-    endif
+    let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
     if empty(l:sval)
         return
     endif
@@ -261,6 +242,28 @@ endfunction
 " All popset start from popset#set#PopSet or popset#set#PopSelection, so clear s:sel here.
 " All sub-popset start from popset#set#SubPopSelection, so push s:sel here.
 
+" FUNCTION: popset#set#FuncLstCompletion(arglead, cmdline, cursorpos) {{{
+" default completion for s:lst
+function! popset#set#FuncLstCompletion(arglead, cmdline, cursorpos)
+    let l:completekeys = []
+
+    for l:key in s:lst
+        if l:key =~ "^".a:arglead
+            call add(l:completekeys, l:key)
+        endif
+    endfor
+
+    return l:completekeys
+endfunction
+" }}}
+
+" FUNCTION: s:funcCmd(sopt, arg) {{{
+" default function for s:cmd
+function! s:funcCmd(sopt, arg)
+    call popc#ui#Msg('There''s nothing to execute')
+endfunction
+" }}}
+
 " FUNCTION: popset#set#SubPopSelection(sopt, arg) {{{
 " @param arg: A dictionary in following format,
 "               {
@@ -277,17 +280,22 @@ endfunction
 "               dic, sub, arg, cpl and get is not necessary,
 "               arg MUST be NOT existed if no extra-args to cmd.
 function! popset#set#SubPopSelection(sopt, arg)
-    let l:arg = (type(a:arg) == v:t_dict) ? a:arg : s:sub[a:arg]
+    let l:arg = (type(a:arg) == v:t_dict) ? a:arg : get(s:sub, a:arg, {})
     let l:sel = {
+        \ 'opt' : '',
+        \ 'lst' : [],
         \ 'dic' : {},
         \ 'sub' : {},
-        \ 'cpl' : '',
+        \ 'cpl' : 'customlist,popset#set#FuncLstCompletion',
+        \ 'cmd' : 's:funcCmd',
         \ 'get' : '',
         \ 'idx' : 0,
         \ }
     call extend(l:sel, l:arg, 'force')
-    let l:sel['opt'] = l:arg.opt[0]
-    if l:sel['cmd'] ==# 'popset#set#SubPopSelection'
+    if type(l:sel.opt) == v:t_list
+        let l:sel.opt = l:sel.opt[0]
+    endif
+    if l:sel.cmd ==# 'popset#set#SubPopSelection'
         if has_key(l:sel, 'arg')
             call remove(l:sel, 'arg')
         endif

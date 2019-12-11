@@ -1,6 +1,6 @@
 
 " SECTION: variables {{{1
-let s:popset_opt_shortname = {}         " map shortname to fullname
+let s:popset_sel_shortname = {}         " map shortname to fullname
 let s:popset_sel = {
     \ 'opt' : ['popset'],
     \ 'lst' : [],
@@ -38,7 +38,7 @@ function! s:createSel()
         " append the opt[1:-1] as shortname
         if (len(l:item['opt']) > 1)
             for l:it in l:item['opt'][1:-1]
-                let s:popset_opt_shortname[l:it] = l:sopt
+                let s:popset_sel_shortname[l:it] = l:sopt
             endfor
         end
     endfor
@@ -59,7 +59,7 @@ function! s:createSel()
             " append the opt[1:-1] as shortname
             if (len(l:item['opt']) > 1)
                 for l:it in l:item['opt'][1:-1]
-                    let s:popset_opt_shortname[l:it] = l:sopt
+                    let s:popset_sel_shortname[l:it] = l:sopt
                 endfor
             end
         endfor
@@ -75,20 +75,15 @@ function! popset#data#GetSel(sopt)
         return s:popset_sel
     else
         " option is given in shortname
-        if has_key(s:popset_opt_shortname, a:sopt)
-            return s:popset_sel.sub[s:popset_opt_shortname[a:sopt]]
+        if has_key(s:popset_sel_shortname, a:sopt)
+            return s:popset_sel.sub[s:popset_sel_shortname[a:sopt]]
         endif
         " option is given in fullname
         if has_key(s:popset_sel.sub, a:sopt)
             return s:popset_sel.sub[a:sopt]
         endif
     endif
-    let l:sel = {
-        \ 'opt' : [''],
-        \ 'lst' : [],
-        \ 'cmd' : '',
-        \ }
-    return l:sel
+    return {}
 endfunction
 " }}}
 
@@ -98,9 +93,9 @@ function! popset#data#GetSelList(arglead, cmdline, cursorpos)
     let l:completekeys = []
 
     " search shortname
-    for l:key in keys(s:popset_opt_shortname)
+    for l:key in keys(s:popset_sel_shortname)
         if l:key =~ "^".a:arglead
-            call add(l:completekeys, s:popset_opt_shortname[l:key])
+            call add(l:completekeys, s:popset_sel_shortname[l:key])
         endif
     endfor
 
@@ -149,7 +144,7 @@ endfunction
 
 " FUNCTION: popset#data#GetOptValue(sopt) {{{
 function! popset#data#GetOptValue(sopt)
-    if has_key(s:popset_sel.sub, a:sopt) || has_key(s:popset_opt_shortname, a:sopt)
+    if has_key(s:popset_sel.sub, a:sopt) || has_key(s:popset_sel_shortname, a:sopt)
         if a:sopt ==# "colorscheme" || a:sopt ==# "colo"
             return g:colors_name
         else

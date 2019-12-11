@@ -1,6 +1,6 @@
 " Popset: Pop selections for vim option settings.
 " Maintainer: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-" Version: 2.3.0
+" Version: 2.3.1
 "
 
 " SETCION: vim-script {{{1
