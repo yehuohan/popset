@@ -19,7 +19,6 @@ let s:arg = []          " args of command
 let s:get = ''          " function to get option value
 let s:idx = 0           " current index of selection
 let s:mapsData = [
-    \ ['popset#set#Pop'   , ['p'],          'Pop popset layer'],
     \ ['popset#set#Load'  , ['CR','Space'], 'Execute (Space: preview execution)'],
     \ ['popset#set#Input' , ['i','I'],      'Input selection value'],
     \ ['popset#set#Back'  , ['u','U'],      'Back to upper selection (U: back to the root-upper selection)'],
@@ -164,12 +163,6 @@ function! s:ps(sel)
 
     call s:createBuffer()
     call s:pop()
-endfunction
-" }}}
-
-" FUNCTION: popset#set#Pop(key) {{{
-function! popset#set#Pop(key)
-    call popset#set#PopSet('popset')
 endfunction
 " }}}
 
