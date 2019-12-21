@@ -166,13 +166,13 @@ function! s:ps(sel)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#Load(key) {{{
-function! popset#set#Load(key)
+" FUNCTION: popset#set#Load(key, index) {{{
+function! popset#set#Load(key, index)
     if empty(s:lst)
         return
     endif
 
-    let s:idx = popc#ui#GetIndex()
+    let s:idx = a:index
     call popc#ui#Destroy()
     if exists('s:arg')
         call function(s:cmd)(s:opt, s:lst[s:idx], s:arg)
@@ -188,11 +188,11 @@ function! popset#set#Load(key)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#Input(key) {{{
-function! popset#set#Input(key)
+" FUNCTION: popset#set#Input(key, index) {{{
+function! popset#set#Input(key, index)
     let l:text = ''
     if a:key ==# 'I'
-        let s:idx = popc#ui#GetIndex()
+        let s:idx = a:index
         let l:text = s:lst[s:idx]
     endif
     let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
@@ -208,8 +208,8 @@ function! popset#set#Input(key)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#Back(key) {{{
-function! popset#set#Back(key)
+" FUNCTION: popset#set#Back(key, index) {{{
+function! popset#set#Back(key, index)
     if s:sel.isEmpty()
         call popc#ui#Msg('No upper selection.')
     else
@@ -222,8 +222,8 @@ function! popset#set#Back(key)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#Help(key) {{{
-function! popset#set#Help(key)
+" FUNCTION: popset#set#Help(key, index) {{{
+function! popset#set#Help(key, index)
     call s:lyr.setMode(s:MODE.Help)
     let [l:cnt, l:txt] = popc#utils#createHelpBuffer(s:mapsData)
     call s:lyr.setBufs(v:t_string, l:cnt, l:txt)
