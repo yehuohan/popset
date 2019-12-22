@@ -86,7 +86,7 @@ endfunction
 
 " FUNCTION: s:createBuffer() {{{
 function! s:createBuffer()
-    let l:text = ''
+    let l:text = []
     let l:max = 0
 
     " get max key text width
@@ -114,11 +114,10 @@ function! s:createBuffer()
             let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
             let l:line .= s:dic[lst]
         endif
-        let l:line .= repeat(' ', &columns - strwidth(l:line) + 1)
-        let l:text .= l:line . "\n"
+        call add(l:text, l:line)
     endfor
 
-    call s:lyr.setBufs(v:t_string, len(s:lst), l:text)
+    call s:lyr.setBufs(v:t_list, l:text)
 endfunction
 " }}}
 
