@@ -2,7 +2,7 @@
 " popset layer.
 
 " SECTION: variables {{{1
-let [s:popc, s:MODE] = popc#popc#GetPopc()
+let s:popc = popc#popc#GetPopc()
 let s:conf = popc#init#GetConfig()
 let s:lyr = {}          " this layer
 let s:sel = {
@@ -22,7 +22,6 @@ let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'], 'Execute (Space: preview execution)'],
     \ ['popset#set#Input' , ['i','I'],      'Input selection value'],
     \ ['popset#set#Back'  , ['u','U'],      'Back to upper selection (U: back to the root-upper selection)'],
-    \ ['popset#set#Help'  , ['?'],          'Show help of popset layer'],
     \ ]
 
 
@@ -79,7 +78,7 @@ function! popset#set#Init()
     let s:lyr = s:popc.addLayer('Popset', 0)
 
     for md in s:mapsData
-        call s:lyr.addMaps(md[0], md[1])
+        call s:lyr.addMaps(md[0], md[1], md[2])
     endfor
 endfunction
 " }}}
@@ -124,7 +123,6 @@ endfunction
 " FUNCTION: s:pop(keepIndex) {{{
 function! s:pop()
     let l:text = 's' . string(s:sel.top) . '. ' . s:opt
-    call s:lyr.setMode(s:MODE.Normal)
     call s:lyr.setInfo('centerText', l:text)
     call s:lyr.setInfo('lastIndex', s:idx)
     call popc#ui#Create(s:lyr.name)
@@ -221,14 +219,6 @@ function! popset#set#Back(key, index)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#Help(key, index) {{{
-function! popset#set#Help(key, index)
-    call s:lyr.setMode(s:MODE.Help)
-    let [l:cnt, l:txt] = popc#utils#createHelpBuffer(s:mapsData)
-    call s:lyr.setBufs(v:t_string, l:cnt, l:txt)
-    call popc#ui#Create(s:lyr.name)
-endfunction
-" }}}
 
 " SECTION: api functions {{{1
 " All popset start from popset#set#PopSet or popset#set#PopSelection, so clear s:sel here.
