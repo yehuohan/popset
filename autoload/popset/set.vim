@@ -80,6 +80,7 @@ function! popset#set#Init()
     for md in s:mapsData
         call s:lyr.addMaps(md[0], md[1], md[2])
     endfor
+    unlet! s:mapsData
 
     call popset#data#Init()
 endfunction
