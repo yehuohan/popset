@@ -80,6 +80,8 @@ function! popset#set#Init()
     for md in s:mapsData
         call s:lyr.addMaps(md[0], md[1], md[2])
     endfor
+
+    call popset#data#Init()
 endfunction
 " }}}
 
@@ -291,7 +293,6 @@ endfunction
 " FUNCTION: popset#set#PopSet(opt) {{{
 " use for popset internal data.
 function! popset#set#PopSet(opt)
-    call popset#data#Init()
     call s:sel.clear()
     call popset#set#SubPopSelection('popset', popset#data#GetSel(a:opt))
 endfunction

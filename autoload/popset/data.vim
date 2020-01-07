@@ -16,18 +16,6 @@ let s:popset_sel = {
 
 " FUNCTION: popset#data#Init() {{{
 function! popset#data#Init()
-    if exists('s:inited')
-        return
-    endif
-    let s:inited = 1
-
-    " generate option data
-    call s:createSel()
-endfunction
-" }}}
-
-" FUNCTION: s:createSel() {{{
-function! s:createSel()
     " generate internal option data
     for l:item in s:popset_selection_data
         let l:sopt = l:item['opt'][0]
