@@ -113,17 +113,22 @@ function! s:createBuffer()
         let l:line .= lst
         if has_key(s:dic, lst)
             " add description of selection if it exits
+            let l:dsr = ''
             if type(s:dic[lst]) == v:t_string
-                let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
-                let l:line .= s:dic[lst]
+                let l:dsr = s:dic[lst]
             elseif type(s:dic[lst]) == v:t_dict
                 if has_key(s:dic[lst], 'dsr')
-                    let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
-                    let l:line .= s:dic[lst]['dsr']
+                    let l:dsr = s:dic[lst]['dsr']
                 elseif has_key(s:dic[lst], 'get')
-                    let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
-                    let l:line .= function(s:dic[lst].get)(s:dic[lst].opt)
+                    let l:dsr = function(s:dic[lst].get)(s:dic[lst].opt)
                 endif
+            "elseif type(s:dic[lst]) == v:t_list
+                " TODO
+                "let l:dsr = string(s:dic[lst][0])
+            endif
+            if !empty(l:dsr)
+                let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
+                let l:line .= l:dsr
             endif
         endif
         call add(l:text, l:line)
@@ -176,12 +181,8 @@ function! s:ps(sel)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#Load(key, index) {{{
-function! popset#set#Load(key, index)
-    if empty(s:lst)
-        return
-    endif
-
+" FUNCTION: s:done(index) {{{
+function! s:done(index)
     let s:idx = a:index
     let l:val = get(s:dic, s:lst[s:idx], v:none)
     if type(l:val) == v:t_dict
@@ -189,17 +190,28 @@ function! popset#set#Load(key, index)
         let l:arg = l:val
     "elseif type(l:val) == v:t_list
         " TODO
+        "let l:Fn = function(s:cmd)
+        "let l:arg = s:lst[s:idx]
     else
         let l:Fn = function(s:cmd)
         let l:arg = s:lst[s:idx]
     endif
-
     call popc#ui#Destroy()
     if exists('s:arg')
         call l:Fn(s:opt, l:arg, s:arg)
     else
         call l:Fn(s:opt, l:arg)
     endif
+endfunction
+" }}}
+
+" FUNCTION: popset#set#Load(key, index) {{{
+function! popset#set#Load(key, index)
+    if empty(s:lst)
+        return
+    endif
+    call s:done(a:index)
+
     if a:key ==# 'Space'
         if !empty(s:get)
             call s:createBuffer()
@@ -217,15 +229,11 @@ function! popset#set#Input(key, index)
         let l:text = s:lst[s:idx]
     endif
     let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
+
     if empty(l:sval)
         return
     endif
-    call popc#ui#Destroy()
-    if exists('s:arg')
-        call function(s:cmd)(s:opt, l:sval, s:arg)
-    else
-        call function(s:cmd)(s:opt, l:sval)
-    endif
+    call s:done(a:index)
 endfunction
 " }}}
 
