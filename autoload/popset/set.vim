@@ -113,8 +113,15 @@ function! s:createBuffer()
         let l:line .= lst
         if has_key(s:dic, lst)
             " add description of selection if it exits
-            let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
-            let l:line .= s:dic[lst]
+            if type(s:dic[lst]) == v:t_string
+                let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
+                let l:line .= s:dic[lst]
+            elseif type(s:dic[lst]) == v:t_dict
+                if has_key(s:dic[lst], 'dsr')
+                    let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
+                    let l:line .= s:dic[lst]['dsr']
+                endif
+            endif
         endif
         call add(l:text, l:line)
     endfor
@@ -173,11 +180,22 @@ function! popset#set#Load(key, index)
     endif
 
     let s:idx = a:index
+    let l:val = get(s:dic, s:lst[s:idx], v:none)
+    if type(l:val) == v:t_dict
+        let l:Fn = function('popset#set#SubPopSelection')
+        let l:arg = l:val
+    "elseif type(l:val) == v:t_list
+        " TODO
+    else
+        let l:Fn = function(s:cmd)
+        let l:arg = s:lst[s:idx]
+    endif
+
     call popc#ui#Destroy()
     if exists('s:arg')
-        call function(s:cmd)(s:opt, s:lst[s:idx], s:arg)
+        call l:Fn(s:opt, l:arg, s:arg)
     else
-        call function(s:cmd)(s:opt, s:lst[s:idx])
+        call l:Fn(s:opt, l:arg)
     endif
     if a:key ==# 'Space'
         if !empty(s:get)
@@ -249,7 +267,7 @@ function! s:funcCmd(sopt, arg)
 endfunction
 " }}}
 
-" FUNCTION: popset#set#SubPopSelection(sopt, arg) {{{
+" FUNCTION: popset#set#SubPopSelection(sopt, arg, ...) {{{
 " @param arg: A dictionary in following format,
 "               {
 "                   \ 'opt' : [],
@@ -264,7 +282,7 @@ endfunction
 "               opt, lst and cmd is necessary,
 "               dic, sub, arg, cpl and get is not necessary,
 "               arg MUST be NOT existed if no extra-args to cmd.
-function! popset#set#SubPopSelection(sopt, arg)
+function! popset#set#SubPopSelection(sopt, arg, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : get(s:sub, a:arg, {})
     let l:sel = {
         \ 'opt' : '',
@@ -279,11 +297,6 @@ function! popset#set#SubPopSelection(sopt, arg)
     call extend(l:sel, l:arg, 'force')
     if type(l:sel.opt) == v:t_list
         let l:sel.opt = l:sel.opt[0]
-    endif
-    if l:sel.cmd ==# 'popset#set#SubPopSelection'
-        if has_key(l:sel, 'arg')
-            call remove(l:sel, 'arg')
-        endif
     endif
     call s:sel.setTop('idx', s:idx)     " save upper selection's index
     call s:sel.push(l:sel)
