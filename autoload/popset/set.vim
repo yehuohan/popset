@@ -120,6 +120,9 @@ function! s:createBuffer()
                 if has_key(s:dic[lst], 'dsr')
                     let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
                     let l:line .= s:dic[lst]['dsr']
+                elseif has_key(s:dic[lst], 'get')
+                    let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
+                    let l:line .= function(s:dic[lst].get)(s:dic[lst].opt)
                 endif
             endif
         endif
