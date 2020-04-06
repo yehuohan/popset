@@ -114,17 +114,16 @@ function! s:createBuffer()
         if has_key(s:dic, lst)
             " add description of selection if it exits
             let l:dsr = ''
-            if type(s:dic[lst]) == v:t_string
-                let l:dsr = s:dic[lst]
-            elseif type(s:dic[lst]) == v:t_dict
+            if type(s:dic[lst]) == v:t_dict
                 if has_key(s:dic[lst], 'dsr')
                     let l:dsr = s:dic[lst]['dsr']
                 elseif has_key(s:dic[lst], 'get')
                     let l:dsr = function(s:dic[lst].get)(s:dic[lst].opt)
                 endif
-            elseif type(s:dic[lst]) == v:t_list
-                " TODO
-                "let l:dsr = string(s:dic[lst][0])
+            elseif type(s:dic[lst]) == v:t_string
+                let l:dsr = s:dic[lst]
+            else
+                let l:dsr = string(s:dic[lst])
             endif
             if !empty(l:dsr)
                 let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
@@ -187,18 +186,14 @@ function! s:done(index, input)
     let l:cur = get(s:dic, s:lst[s:idx], v:none)
 
     " take input from dic
-    if a:input != v:none && type(l:cur) != v:t_list
+    if a:input != v:none
         let l:cur = get(s:dic, a:input, v:none)
     endif
 
+    " done for dict, list or string ...
     if type(l:cur) == v:t_dict
         let l:Fn = function('popset#set#SubPopSelection')
         let l:arg = l:cur
-    elseif type(l:cur) == v:t_list
-        " TODO
-        "let l:Fn = function(s:cmd)
-        "let l:arg = s:lst[s:idx]
-        return
     else
         let l:Fn = function(s:cmd)
         let l:arg = (a:input != v:none) ? a:input : s:lst[s:idx]
@@ -242,6 +237,10 @@ function! popset#set#Input(key, index)
         return
     endif
     call s:done(a:index, l:sval)
+    if !empty(s:get)
+        call s:createBuffer()
+    endif
+    call s:pop()
 endfunction
 " }}}
 
