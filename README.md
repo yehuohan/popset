@@ -193,6 +193,33 @@ let s:menu = {
 call PopSelection(s:menu)
 ```
 
+Use selection for setttings example:
+
+```vim
+let s:gset = {
+    \ 'set_os'        : v:none,
+    \ 'use_utils'     : 1,
+    \ }
+function! InitSet(sopt, arg)
+    let s:gset[a:sopt] = a:arg
+endfunction
+function! InitGet(sopt)
+    return s:gset[a:sopt]
+endfunction
+function! InitSave()
+    " add code rely on s:gset
+endfunction
+call PopSelection({
+    \ 'opt' : 'select settings',
+    \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
+    \ 'dic' : {
+        \ 'set_os'    : {'opt': 'set_os'    , 'lst': ['win', 'arch'], 'cmd': 'InitSet', 'get': 'InitGet'},
+        \ 'use_utils' : {'opt': 'use_utils' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+        \ },
+    \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:none}
+    \ })
+```
+
 ---
 <h2 id="5">Help doc</h2>
 
