@@ -90,7 +90,7 @@ endfunction
 
 All the surpported options is according to help-doc of vim8.0.
 
-- Set `cmd` to `popset#set#SubPopSet` make sub selection:
+- Set `cmd` to `popset#set#SubPopSelection` make sub selection:
 
 All selection in the `lst` must be the `popset internal data`.
 
@@ -100,7 +100,7 @@ let g:Popset_SelectionData = [
     \{
         \ 'opt' : ['example'],
         \ 'lst' : ['example'],
-        \ 'cmd' : 'popset#set#SubPopSet',
+        \ 'cmd' : 'popset#set#SubPopSelection',
     \}
     \]
 ```
@@ -116,13 +116,13 @@ let g:Popset_SelectionData = [
 
 ```vim
 let l:dict = {
-    \ 'opt' : [],
+    \ 'opt' : <list or stsring>,
     \ 'lst' : [],
     \ 'dic' : {},
     \ 'sub' : {},
     \ 'cpl' : '',
     \ 'cmd' : '',
-    \ 'arg' : [],
+    \ 'arg' : <any type>,
     \ 'get' : '',
     \ }
 ```
@@ -139,13 +139,14 @@ let l:dict = {
 
 *`cmd`(not necessary):* Similar to `cmd` in `popset internal data`. Set `cmd` to `popset#set#SubPopSet` make sub selection. The sub selection is from `sub`.
 
-*`arg`(not necessary):* `arg` is the extra-args-list append to `cmd`. If `cmd` doesn't need extra-args-list, the `dict` must NOT contain the `arg` key.
+*`arg`(not necessary):* `arg` is the extra-args append to `cmd`. If `cmd` doesn't need extra-args, the `dict` must NOT contain the `arg` key.
 
 *`get`(not necessary):* Similar to `get` in `popset internal data`.
 
 A sub selection example:
 
 ```vim
+" use multi dict
 let s:m_nf = {
     \ "opt" : ["menu new file"],
     \ "lst" : ["a.py", "b.vim"],
@@ -169,6 +170,26 @@ let s:menu = {
             \ },
     \ "cmd" : "popset#set#SubPopSelection"
     \ }
+" or with embed dict
+let s:menu = {
+    \ "opt" : ["Which action to execute?"],
+    \ "lst" : ["new file", "open file"],
+    \ "dic" : {
+            \ "new file" : {
+                \ "opt" : ["menu new file"],
+                \ "dsr" : "create new file",
+                \ "lst" : ["a.py", "b.vim"],
+                \ "cmd" : {sopt, arg -> execute(":e " . arg)}
+                \ },
+            \ "open file" : {
+                \ "opt" : ["menu open file"],
+                \ "dsr" : "open existed file",
+                \ "lst" : ["c.py", "d.vim"],
+                \ "cmd" : {sopt, arg -> execute(":e " . arg)}
+                \ }
+            \ },
+    \ }
+" show selection
 call PopSelection(s:menu)
 ```
 
