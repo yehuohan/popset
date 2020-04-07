@@ -183,11 +183,11 @@ endfunction
 " FUNCTION: s:done(index, input) {{{
 function! s:done(index, input)
     let s:idx = a:index
-    let l:cur = get(s:dic, s:lst[s:idx], v:none)
+    let l:cur = get(s:dic, s:lst[s:idx], v:null)
 
     " take input from dic
-    if a:input != v:none
-        let l:cur = get(s:dic, a:input, v:none)
+    if a:input != v:null
+        let l:cur = get(s:dic, a:input, v:null)
     endif
 
     " done for dict, list or string ...
@@ -196,7 +196,7 @@ function! s:done(index, input)
         let l:arg = l:cur
     else
         let l:Fn = function(s:cmd)
-        let l:arg = (a:input != v:none) ? a:input : s:lst[s:idx]
+        let l:arg = (a:input != v:null) ? a:input : s:lst[s:idx]
     endif
 
     call popc#ui#Destroy()
@@ -213,7 +213,7 @@ function! popset#set#Load(key, index)
     if empty(s:lst)
         return
     endif
-    call s:done(a:index, v:none)
+    call s:done(a:index, v:null)
 
     if a:key ==# 'Space'
         if !empty(s:get)

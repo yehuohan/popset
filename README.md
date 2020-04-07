@@ -197,7 +197,7 @@ Use selection for setttings example:
 
 ```vim
 let s:gset = {
-    \ 'set_os'        : v:none,
+    \ 'set_os'        : v:null,
     \ 'use_utils'     : 1,
     \ }
 function! InitSet(sopt, arg)
@@ -216,7 +216,7 @@ call PopSelection({
         \ 'set_os'    : {'opt': 'set_os'    , 'lst': ['win', 'arch'], 'cmd': 'InitSet', 'get': 'InitGet'},
         \ 'use_utils' : {'opt': 'use_utils' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
         \ },
-    \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:none}
+    \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:null}
     \ })
 ```
 
