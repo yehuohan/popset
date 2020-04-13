@@ -31,17 +31,9 @@ Plug 'yehuohan/popc'
 
 There is only one command `PopSet`, which is similar to `set` command, in popset. What can be set by `PopSet` is all in `popset internal data`.
 
-Example for `foldmethod`:
-```
-:PopSet foldmethod
-```
-![PopsetEx](popset1.gif)
-
-Example for `colorscheme`:
-```
-:PopSet colorscheme
-```
-![PopsetEx](popset2.gif)
+<div align="center">
+<img alt="Popset" src="https://github.com/yehuohan/popset/blob/master/popset.gif"  width=75% height=75% />
+</div>
 
  - Add selections to `g:Popset_SelectionData` as `popset internal data`:
 
