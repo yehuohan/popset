@@ -12,11 +12,9 @@ let s:sel = {
 let s:opt = ''          " option name of selection
 let s:lst = []          " list of selection
 let s:dic = {}          " dictionary of description
-let s:sub = {}          " sub selection
 let s:cpl = ''          " completion for input
-let s:cmd = ''          " command function
-let s:arg = []          " args of command
-let s:get = ''          " function to get option value
+let s:Cmd = ''          " command function
+let s:Get = ''          " function to get option value
 let s:idx = 0           " current index of selection
 let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'], 'Execute (Space: preview execution)'],
@@ -98,31 +96,36 @@ function! s:createBuffer()
     endfor
 
     " create and tabular buffer text
-    if !empty(s:get)
-        let l:val = function(s:get)(s:opt)
+    if s:Get != v:null
+        let l:val = s:Get(s:opt)
         let l:max += 4
     else
         unlet! l:val
         let l:max += 2
     endif
     for lst in s:lst
+        " show lst
         let l:line = '  '
-        if !empty(s:get)
+        if s:Get != v:null
             let l:line .= ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' '
         endif
         let l:line .= lst
+
+        " show dic
         if has_key(s:dic, lst)
-            " add description of selection if it exits
             let l:dsr = ''
             if type(s:dic[lst]) == v:t_dict
+                " use dsr or get value of sub selection's opt
                 if has_key(s:dic[lst], 'dsr')
                     let l:dsr = s:dic[lst]['dsr']
                 elseif has_key(s:dic[lst], 'get')
                     let l:dsr = function(s:dic[lst].get)(s:dic[lst].opt)
                 endif
             elseif type(s:dic[lst]) == v:t_string
+                " use string-value of dic
                 let l:dsr = s:dic[lst]
             else
+                " convert value of dic to string
                 let l:dsr = string(s:dic[lst])
             endif
             if !empty(l:dsr)
@@ -148,31 +151,20 @@ endfunction
 
 " FUNCTION: s:ps(sel) {{{
 " @param dict: A dictionary in following format,
-"               {
-"                   \ 'opt' : '',
-"                   \ 'lst' : [],
-"                   \ 'dic' : {},
-"                   \ 'sub' : {},
-"                   \ 'cpl' : '',
-"                   \ 'cmd' : '',
-"                   \ 'arg' : [],
-"                   \ 'get' : '',
-"                   \ 'idx' : 0,
-"               }
-"               idx is current selection index.
+" idx is current selection index.
 function! s:ps(sel)
     let s:opt = a:sel['opt']
     let s:lst = a:sel['lst']
     let s:dic = a:sel['dic']
     let s:sub = a:sel['sub']
     let s:cpl = a:sel['cpl']
-    let s:cmd = a:sel['cmd']
+    let s:Cmd = a:sel['cmd']
+    let s:Get = a:sel['get']
     if has_key(a:sel, 'arg')
         let s:arg = a:sel.arg
     else
         unlet! s:arg
     endif
-    let s:get = a:sel['get']
     let s:idx = a:sel['idx']            " recover selection's index
 
     call s:createBuffer()
@@ -195,7 +187,7 @@ function! s:done(index, input)
         let l:Fn = function('popset#set#SubPopSelection')
         let l:arg = l:cur
     else
-        let l:Fn = function(s:cmd)
+        let l:Fn = s:Cmd
         let l:arg = (a:input != v:null) ? a:input : s:lst[s:idx]
     endif
 
@@ -216,7 +208,7 @@ function! popset#set#Load(key, index)
     call s:done(a:index, v:null)
 
     if a:key ==# 'Space'
-        if !empty(s:get)
+        if s:Get != v:null
             call s:createBuffer()
         endif
         call s:pop()
@@ -237,7 +229,7 @@ function! popset#set#Input(key, index)
         return
     endif
     call s:done(a:index, l:sval)
-    if !empty(s:get)
+    if s:Get != v:null
         call s:createBuffer()
     endif
     call s:pop()
@@ -279,7 +271,7 @@ endfunction
 " }}}
 
 " FUNCTION: s:funcCmd(sopt, arg) {{{
-" default function for s:cmd
+" default function for s:Cmd
 function! s:funcCmd(sopt, arg)
     call popc#ui#Msg('There''s nothing to execute')
 endfunction
@@ -287,19 +279,18 @@ endfunction
 
 " FUNCTION: popset#set#SubPopSelection(sopt, arg, ...) {{{
 " @param arg: A dictionary in following format,
-"               {
-"                   \ 'opt' : [],
-"                   \ 'lst' : [],
-"                   \ 'dic' : {},
-"                   \ 'sub' : {},
-"                   \ 'cpl' : '',
-"                   \ 'cmd' : '',
-"                   \ 'arg' : [],
-"                   \ 'get' : '',
-"               }
-"               opt, lst and cmd is necessary,
-"               dic, sub, arg, cpl and get is not necessary,
-"               arg MUST be NOT existed if no extra-args to cmd.
+"   {
+"       \ 'opt' : string-list or string
+"       \ 'dsr' : string
+"       \ 'lst' : string-list
+"       \ 'dic' : string-dict or sub-dict
+"       \ 'cpl' : 'completion' used same to input()
+"       \ 'cmd' : function-name or funcref or lambda
+"       \ 'get' : function-name or funcref or lambda
+"       \ 'arg' : any type
+"   }
+" 'arg' MUST be NOT existed if no extra-args to cmd.
+" 'sub' is keeped for compatibility.
 function! popset#set#SubPopSelection(sopt, arg, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : get(s:sub, a:arg, {})
     let l:sel = {
@@ -308,14 +299,36 @@ function! popset#set#SubPopSelection(sopt, arg, ...)
         \ 'dic' : {},
         \ 'sub' : {},
         \ 'cpl' : 'customlist,popset#set#FuncLstCompletion',
-        \ 'cmd' : 's:funcCmd',
-        \ 'get' : '',
+        \ 'cmd' : v:null,
+        \ 'get' : v:null,
         \ 'idx' : 0,
         \ }
     call extend(l:sel, l:arg, 'force')
+    " check opt
     if type(l:sel.opt) == v:t_list
-        let l:sel.opt = l:sel.opt[0]
+        if empty(l:sel.opt)
+            let l:sel.opt = ''
+        else
+            let l:sel.opt = l:sel.opt[0]
+        endif
     endif
+    " check cmd
+    if type(l:sel.cmd) == v:t_func
+        "
+    elseif type(l:sel.cmd) == v:t_string && !empty(l:sel.cmd)
+        let l:sel.cmd = function(l:sel.cmd)
+    else
+        let l:sel.cmd = function('s:funcCmd')
+    endif
+    " check get
+    if type(l:sel.get) == v:t_func
+        "
+    elseif type(l:sel.get) == v:t_string && !empty(l:sel.get)
+        let l:sel.get = function(l:sel.get)
+    else
+        let l:sel.get = v:null
+    endif
+    " handle selection
     call s:sel.setTop('idx', s:idx)     " save upper selection's index
     call s:sel.push(l:sel)
     call s:ps(l:sel)

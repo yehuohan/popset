@@ -9,9 +9,9 @@
 
 ---
 
-**Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing some function and so on.
+**Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing function with args and so on.
 
-**Popset** is a new implementation with [popc](https://github.com/yehuohan/popc). (The old implementation is in old-master branch)
+The lastest **Popset** is implementated with [popc](https://github.com/yehuohan/popc). (The old implementation is in old-master branch)
 
 
 ---
@@ -38,6 +38,16 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
  - Add selections to `g:Popset_SelectionData` as `popset internal data`:
 
 ```vim
+"   {
+"       'opt' : string-list
+"       'dsr' : string
+"       'lst' : string-list
+"       'dic' : string-dict or sub-dict
+"       'cpl' : 'completion' used same to input()
+"       'cmd' : function-name or funcref or lambda
+"       'get' : function-name or funcref or lambda
+"   }
+
 let g:Popset_SelectionData = [
     \{
         \ "opt" : ["filetype", "ft"],
@@ -48,121 +58,71 @@ let g:Popset_SelectionData = [
                 \ "vim": "Vim script file",
                 \ },
         \ "cpl" : 'filetype',
-        \ "cmd" : "g:SetEqual",
-        \ "get" : "g:GetValue"
+        \ "cmd" : "SetEqual",
+        \ "get" : "GetValue"
     \}
     \]
-function! g:SetEqual(sopt, arg)
+function! SetEqual(sopt, arg)
     execute "set " . a:sopt . "=" . a:arg
 endfunction
-function! g:GetValue(sopt)
+function! GetValue(sopt)
     return eval("&".a:sopt)
 endfunction
 ```
 
-***`opt`(necessary):*** `opt` is the option name list. `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will think two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset will append the `lst` and `dic` (no `cmd`) but not override the existed one. Hence, the `opt` of options you add must be different to other `opt` of options, or you'll mix up the `lst` and `dic` of different options.
+*`opt`:* `opt` is the option name list. `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will take two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset would only append the `lst` and `dic` but not override the existed one.
 
-*`dsr`(not necessary):* `dsr` is the description of `opt`, which will be taken as the `lst` of the popset option.
+*`dsr`:* `dsr` is the description of `opt`.
 
-***`lst`(necessary):*** `lst` is the selection list of the `opt`.
+*`lst`:* `lst` is the selection list of the `opt`.
 
-*`dic`(not necessary):* `dic` is description of `lst` and `dic` can be empty.
+*`dic`:* `dic` is a description or sub-selection, who's key is from `lst`.
 
-*`cpl`(not necessary):* `cpl` is completion for input selection value.
+*`cpl`:* `cpl` is completion for input selection value.
 
-*`cmd`(not necessary):* `cmd` is the function which must execute with `opt` and `lst` args. In the example code, for example, the `g:SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Of course, the `arg` can be any type(string, list, dictetory and so on) you want.
+*`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`.
 
-*`get`(not necessary):* `get` is a function used to get the value of `opt`.
+*`get`:* `get` is a function used to get the value of `opt`.
 
  - Show all the surpported options of popset:
 
 ```vim
 :PopSet popset
 ```
+All the surpported options is according to vim-help-doc.
 
-All the surpported options is according to help-doc of vim8.0.
-
-- Set `cmd` to `popset#set#SubPopSelection` make sub selection:
-
-All selection in the `lst` must be the `popset internal data`.
-
-```vim
-" This is the loop-selection
-let g:Popset_SelectionData = [
-    \{
-        \ 'opt' : ['example'],
-        \ 'lst' : ['example'],
-        \ 'cmd' : 'popset#set#SubPopSelection',
-    \}
-    \]
-```
 
 ---
 <h2 id="4">Function Usage</h2>
 
 <h3 id="4.1">PopSelection</h3>
 
-`PopSelection(dict)` is used to pop selections with given `dict`. The `dict` is similar to g:Popset_SelectionData, but belong to `popset external data`.
+`PopSelection(dict)` is used to pop selections with given `dict`. The `dict` is similar to g:Popset_SelectionData, but **NOT** belong to `popset internal data`.
 
 `dict` must be in the format:
 
 ```vim
-let l:dict = {
-    \ 'opt' : <list or stsring>,
-    \ 'lst' : [],
-    \ 'dic' : {},
-    \ 'sub' : {},
-    \ 'cpl' : '',
-    \ 'cmd' : '',
-    \ 'arg' : <any type>,
-    \ 'get' : '',
-    \ }
+"   {
+"       'opt' : string-list or string
+"       'dsr' : string
+"       'lst' : string-list
+"       'dic' : string-dict or sub-dict
+"       'cpl' : 'completion' used same to input()
+"       'cmd' : function-name or funcref or lambda
+"       'get' : function-name or funcref or lambda
+"       'arg' : any type
+"   }
 ```
 
-***`opt`(necessary):*** Similar to `opt` in `popset internal data`.
+*`opt`:* Descriptiong of selection which is **NOT** requeried be different from each other. When it's list, `opt[0]` is used.
 
-***`lst`(necessary):*** Similar to `lst` in `popset internal data`.
+*`dsr`*, *`lst`*, *`dic`*, *`cpl`*, *`cmd`*, *`get`:* Similar to `get` in `popset internal data`.
 
-*`dic`(not necessary):* Similar to `dic` in `popset internal data`.
+*`arg`:* `arg` is the extra-args passed to `cmd`. If `cmd` doesn't need extra-args, the `dict` must **NOT** contain the `arg` key.
 
-*`sub`(not necessary):* `sub` is sub selection with key from `lst`. It's necessary if `cmd` is `popset#set#PopSelection`.
-
-*`cpl`(not necessary):* Similar to `cpl` in `popset internal data`.
-
-*`cmd`(not necessary):* Similar to `cmd` in `popset internal data`. Set `cmd` to `popset#set#SubPopSet` make sub selection. The sub selection is from `sub`.
-
-*`arg`(not necessary):* `arg` is the extra-args append to `cmd`. If `cmd` doesn't need extra-args, the `dict` must NOT contain the `arg` key.
-
-*`get`(not necessary):* Similar to `get` in `popset internal data`.
-
-A sub selection example:
+A example with sub-selection:
 
 ```vim
-" use multi dict
-let s:m_nf = {
-    \ "opt" : ["menu new file"],
-    \ "lst" : ["a.py", "b.vim"],
-    \ "cmd" : {sopt, arg -> execute(":e " . arg)}
-    \ }
-let s:m_of = {
-    \ "opt" : ["menu open file"],
-    \ "lst" : ["c.py", "d.vim"],
-    \ "cmd" : {sopt, arg -> execute(":e " . arg)}
-    \ }
-let s:menu = {
-    \ "opt" : ["Which action to execute?"],
-    \ "lst" : ["new file", "open file"],
-    \ "dic" : {
-            \ "new file" : "create new file",
-            \ "open file" : "open existed file"
-            \ },
-    \ "sub" : {
-            \ "new file" : s:m_nf,
-            \ "open file" : s:m_of
-            \ },
-    \ "cmd" : "popset#set#SubPopSelection"
-    \ }
-" or with embed dict
 let s:menu = {
     \ "opt" : ["Which action to execute?"],
     \ "lst" : ["new file", "open file"],
