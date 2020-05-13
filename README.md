@@ -116,7 +116,7 @@ All the surpported options is according to vim-help-doc.
 
 *`opt`:* Descriptiong of selection which is **NOT** requeried be different from each other. When it's list, `opt[0]` is used.
 
-*`dsr`*, *`lst`*, *`dic`*, *`cpl`*, *`cmd`*, *`get`:* Similar to `get` in `popset internal data`.
+*`dsr`*, *`lst`*, *`dic`*, *`cpl`*, *`cmd`*, *`get`:* Similar to used in `popset internal data`.
 
 *`arg`:* `arg` is the extra-args passed to `cmd`. If `cmd` doesn't need extra-args, the `dict` must **NOT** contain the `arg` key.
 
