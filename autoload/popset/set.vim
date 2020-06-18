@@ -291,6 +291,7 @@ endfunction
 "   }
 " 'arg' MUST be NOT existed if no extra-args to cmd.
 " 'sub' is keeped for compatibility.
+" @param ...: avoid calling 'popset#set#SubPopSelection' with 's:arg'
 function! popset#set#SubPopSelection(sopt, arg, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : get(s:sub, a:arg, {})
     let l:sel = {
