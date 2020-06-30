@@ -5,7 +5,6 @@
  - [Function Usage](#4)
     - [PopSelection](#4.1)
  - [Help doc](#5)
- - [Contributor](#6)
 
 ---
 
@@ -176,10 +175,3 @@ call PopSelection({
 <h2 id="5">Help doc</h2>
 
 More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt) and [popc.txt](https://github.com/yehuohan/popc/blob/master/doc/popc.txt)
-
----
-<h2 id="6">Contributor</h2>
-
- - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
-
-
