@@ -17,9 +17,9 @@ let s:Cmd = ''          " command function
 let s:Get = ''          " function to get option value
 let s:idx = 0           " current index of selection
 let s:mapsData = [
-    \ ['popset#set#Load'  , ['CR','Space'], 'Execute (Space: preview execution)'],
-    \ ['popset#set#Input' , ['i','I'],      'Input selection value'],
-    \ ['popset#set#Back'  , ['u','U'],      'Back to upper selection (U: back to the root-upper selection)'],
+    \ ['popset#set#Load'  , ['CR','Space'],      'Execute (Space: preview execution)'],
+    \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit selection value'],
+    \ ['popset#set#Back'  , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
     \ ]
 
 
@@ -172,17 +172,23 @@ function! s:ps(sel)
 endfunction
 " }}}
 
-" FUNCTION: s:done(index, input) {{{
-function! s:done(index, input)
+" FUNCTION: s:done(index, input, kepp) {{{
+" @param index: The selection index
+" @param input: The selection inputed by user if it's not v:null
+" @param keep: Keep displaying selection after done
+function! s:done(index, input, keep)
+    if empty(s:lst) && a:input == v:null
+        return
+    endif
     let s:idx = a:index
-    let l:cur = get(s:dic, s:lst[s:idx], v:null)
-
-    " take input from dic
+    if !empty(s:lst)
+        let l:cur = get(s:dic, s:lst[s:idx], v:null)
+    endif
     if a:input != v:null
         let l:cur = get(s:dic, a:input, v:null)
     endif
 
-    " done for dict, list or string ...
+    " done for sub-dict or string-list or input-string
     if type(l:cur) == v:t_dict
         let l:Fn = function('popset#set#SubPopSelection')
         let l:arg = l:cur
@@ -191,23 +197,16 @@ function! s:done(index, input)
         let l:arg = (a:input != v:null) ? a:input : s:lst[s:idx]
     endif
 
+    " callback with selection
     call popc#ui#Destroy()
     if exists('s:arg')
         call l:Fn(s:opt, l:arg, s:arg)
     else
         call l:Fn(s:opt, l:arg)
     endif
-endfunction
-" }}}
 
-" FUNCTION: popset#set#Load(key, index) {{{
-function! popset#set#Load(key, index)
-    if empty(s:lst)
-        return
-    endif
-    call s:done(a:index, v:null)
-
-    if a:key ==# 'Space'
+    " keep displaying selection
+    if a:keep
         if s:Get != v:null
             call s:createBuffer()
         endif
@@ -216,23 +215,17 @@ function! popset#set#Load(key, index)
 endfunction
 " }}}
 
+" FUNCTION: popset#set#Load(key, index) {{{
+function! popset#set#Load(key, index)
+    call s:done(a:index, v:null, a:key ==# 'Space')
+endfunction
+" }}}
+
 " FUNCTION: popset#set#Input(key, index) {{{
 function! popset#set#Input(key, index)
-    let l:text = ''
-    if a:key ==# 'I'
-        let s:idx = a:index
-        let l:text = s:lst[s:idx]
-    endif
+    let l:text = (empty(s:lst) || a:key ==? 'i') ? '' : s:lst[a:index]
     let l:sval = popc#ui#Input('Input: ', l:text, s:cpl)
-
-    if empty(l:sval)
-        return
-    endif
-    call s:done(a:index, l:sval)
-    if s:Get != v:null
-        call s:createBuffer()
-    endif
-    call s:pop()
+    call s:done(a:index, l:sval, a:key =~# '[ie]')
 endfunction
 " }}}
 
