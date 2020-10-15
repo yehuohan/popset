@@ -73,7 +73,10 @@ endfunction
 
 " FUNCTION: popset#set#Init() {{{
 function! popset#set#Init()
-    let s:lyr = s:popc.addLayer('Popset', 0)
+    let s:lyr = s:popc.addLayer('Popset', {
+                \ 'bindCom' : 0,
+                \ 'fnPop' : function('popset#set#PopSet', ['popset']),
+                \ })
 
     for md in s:mapsData
         call s:lyr.addMaps(md[0], md[1], md[2])

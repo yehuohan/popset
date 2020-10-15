@@ -1,6 +1,6 @@
 " Popset: Pop selections for vim option settings.
 " Maintainer: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-" Version: 2.3.13
+" Version: 2.3.14
 "
 
 " SETCION: vim-script {{{1
@@ -9,6 +9,13 @@ if exists("g:popset_loaded")
 endif
 
 let g:popset_loaded = 1
+
+if !exists("g:popc_loaded")
+    echohl WarningMsg
+    echomsg "[Popset] Popc is required!"
+    echohl None
+    finish
+endif
 
 command! -nargs=+ -complete=customlist,popset#data#GetSelList PopSet :call popset#set#PopSet(<f-args>)
 
