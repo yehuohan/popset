@@ -100,6 +100,7 @@ The dict must be in the format: >
         \ 'cmd' : '',
         \ 'get' : '',
         \ 'arg' : <any type>,
+        \ 'sub' : {}
         \ }
 <
 

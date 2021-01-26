@@ -11,25 +11,27 @@ let s:sel = {
     \ }
 " {{{ s:cur format
 "   opt = ''          " option name of selection
+"   dsr = ''          " description for opt
 "   lst = []          " list of selection
 "   dic = {}          " dictionary of description or sub-selection
 "   cpl = ''          " completion for input
 "   cmd = ''          " command function
 "   get = ''          " function to get option value
-"   sub = {}          " common 'cpl', 'cmd', 'get' for sub-selection
+"   sub = {}          " common 'dsr', 'cpl', 'cmd', 'get' for sub-selection
 "   idx = 0           " current index of selection
 " }}}
+let s:cur = {}
 let s:default = {
     \ 'opt' : '',
     \ 'lst' : [],
     \ 'dic' : {},
+    \ 'dsr' : v:null,
     \ 'cpl' : 'customlist,popset#set#FuncLstCompletion',
     \ 'cmd' : v:null,
     \ 'get' : v:null,
     \ 'sub' : {},
     \ 'idx' : 0,
     \ }
-let s:cur = deepcopy(s:default)
 let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'],      'Execute (Space: preview execution)'],
     \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
@@ -102,71 +104,6 @@ function! popset#set#Init()
 endfunction
 " }}}
 
-" FUNCTION: s:createBuffer() {{{
-function! s:createBuffer()
-    let l:text = []
-    let l:max = 0
-
-    " get max key text width
-    for lst in s:cur.lst
-        let l:keywid = strwidth(lst)
-        let l:max = (l:keywid > l:max) ? l:keywid : l:max
-    endfor
-
-    " create and tabular buffer text
-    if s:cur.get != v:null
-        let l:val = s:cur.get(s:cur.opt)
-        let l:max += 4
-    else
-        unlet! l:val
-        let l:max += 2
-    endif
-    for lst in s:cur.lst
-        " show lst
-        let l:line = '  '
-        if s:cur.get != v:null
-            let l:line .= ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' '
-        endif
-        let l:line .= lst
-
-        " show dic
-        if has_key(s:cur.dic, lst)
-            let l:dsr = ''
-            if type(s:cur.dic[lst]) == v:t_dict
-                " use dsr or get value of sub selection's opt
-                if has_key(s:cur.dic[lst], 'dsr')
-                    let l:dsr = s:cur.dic[lst]['dsr']
-                elseif has_key(s:cur.dic[lst], 'get')
-                    let l:dsr = function(s:cur.dic[lst].get)(s:cur.dic[lst].opt)
-                endif
-            elseif type(s:cur.dic[lst]) == v:t_string
-                " use string-value of dic
-                let l:dsr = s:cur.dic[lst]
-            else
-                " convert value of dic to string
-                let l:dsr = string(s:cur.dic[lst])
-            endif
-            if !empty(l:dsr)
-                let l:line .= repeat(' ', l:max - strwidth(l:line)) . ' : '
-                let l:line .= l:dsr
-            endif
-        endif
-        call add(l:text, l:line)
-    endfor
-
-    call s:lyr.setBufs(v:t_list, l:text)
-endfunction
-" }}}
-
-" FUNCTION: s:pop(keepIndex) {{{
-function! s:pop()
-    let l:text = 's' . string(s:sel.top) . '. ' . s:cur.opt
-    call s:lyr.setInfo('centerText', l:text)
-    call s:lyr.setInfo('lastIndex', s:cur.idx)
-    call popc#ui#Create(s:lyr.name)
-endfunction
-" }}}
-
 " FUNCTION: popset#set#FuncLstCompletion(arglead, cmdline, cursorpos) {{{
 " default completion for s:cur.lst
 function! popset#set#FuncLstCompletion(arglead, cmdline, cursorpos)
@@ -189,37 +126,148 @@ function! s:funcCmd(sopt, arg)
 endfunction
 " }}}
 
-" FUNCTION: s:unify(arg) {{{
-function! s:unify(arg)
+" FUNCTION: s:unify(arg, ...) {{{
+" must have set s:cur.idx before call s:unify,
+" or provide @param a:1, which is the key of upper.dic
+function! s:unify(arg, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
-    let l:sel = deepcopy(s:default)
+    " 'cpl', 'cmd', 'get' can be from s:cur.sub
+    " 'opt' can be from s:cur.lst[s:cur.idx]
+    let l:sel = {
+        \ 'lst' : [],
+        \ 'dic' : {},
+        \ 'sub' : {},
+        \ 'idx' : 0,
+        \ }
     call extend(l:sel, l:arg, 'force')
     " check opt
-    if type(l:sel.opt) == v:t_list
-        if empty(l:sel.opt)
-            let l:sel.opt = ''
-        else
-            let l:sel.opt = l:sel.opt[0]
+    if has_key(l:sel, 'opt')
+        if type(l:sel.opt) == v:t_list
+            let l:sel.opt = empty(l:sel.opt) ? '' : l:sel.opt[0]
         endif
+    else
+        " the upper selection must has 'lst' for the sub-selection is from upper.dic
+        let l:sel.opt = (a:0 >= 1) ? a:1 : s:cur.lst[s:cur.idx]
+    endif
+    " check dsr
+    if !has_key(l:sel, 'dsr')
+        let l:sel.dsr = get(s:cur.sub, 'dsr', v:null)
+    endif
+    " check cpl
+    if !has_key(l:sel, 'cpl')
+        let l:sel.cpl = get(s:cur.sub, 'cpl', 'customlist,popset#set#FuncLstCompletion')
     endif
     " check cmd
-    if type(l:sel.cmd) == v:t_func
-        "
-    elseif type(l:sel.cmd) == v:t_string && !empty(l:sel.cmd)
-        let l:sel.cmd = function(l:sel.cmd)
+    if has_key(l:sel, 'cmd')
+        if type(l:sel.cmd) == v:t_string
+            let l:sel.cmd = function(l:sel.cmd)
+        endif
     else
-        let l:sel.cmd = function('s:funcCmd')
+        let l:sel.cmd = function(get(s:cur.sub, 'cmd', 's:funcCmd'))
     endif
     " check get
-    if type(l:sel.get) == v:t_func
-        "
-    elseif type(l:sel.get) == v:t_string && !empty(l:sel.get)
-        let l:sel.get = function(l:sel.get)
+    if has_key(l:sel, 'get')
+        if type(l:sel.get) == v:t_string
+            let l:sel.get = function(l:sel.get)
+        endif
     else
-        let l:sel.get = v:null
+        let l:sel.get = has_key(s:cur.sub, 'get') ? function(s:cur.sub.get) : v:null
     endif
 
     return l:sel
+endfunction
+" }}}
+
+" FUNCTION: s:createBuffer() {{{
+function! s:createBuffer()
+    " get max key text width
+    let l:max = 0
+    for lst in s:cur.lst
+        let l:keywid = strwidth(lst)
+        let l:max = (l:keywid > l:max) ? l:keywid : l:max
+    endfor
+
+    " fix l:max
+    if s:cur.get != v:null
+        let l:val = s:cur.get(s:cur.opt)
+        let l:max += 4
+    else
+        unlet! l:val
+        let l:max += 2
+    endif
+
+    " create buffer text
+    let l:blks = []
+    let l:maxget = 0
+    for lst in s:cur.lst
+        call add(l:blks, [])
+        " show lst
+        let l:txt = '  '
+        if s:cur.get != v:null
+            let l:txt .= ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' '
+        endif
+        let l:txt .= lst
+        call add(l:blks[-1], l:txt)
+
+        " show dic
+        if has_key(s:cur.dic, lst)
+            let l:dsr = ''
+            if type(s:cur.dic[lst]) == v:t_dict
+                " insert value of sub-selection from 'get'
+                let l:ss = s:unify(s:cur.dic[lst], lst)
+                if l:ss.get != v:null
+                    let l:val = l:ss.get(l:ss.opt)
+                    let l:wid = strwidth(l:val)
+                    let l:maxget = (l:wid > l:maxget) ? l:wid : l:maxget
+                    call add(l:blks[-1], l:val)
+                endif
+
+                " use dsr of sub-selection's
+                if l:ss.dsr != v:null
+                    if type(l:ss.dsr) == v:t_string
+                        let l:dsr .= l:ss.dsr
+                    elseif type(l:ss.dsr) == v:t_func
+                        let l:dsr .= l:ss.dsr(l:ss.opt)
+                    endif
+                else
+                    let l:dsr .= string(l:ss.lst)
+                endif
+            elseif type(s:cur.dic[lst]) == v:t_string
+                " use string-value of dic
+                let l:dsr = s:cur.dic[lst]
+            else
+                " convert value of dic to string
+                let l:dsr = string(s:cur.dic[lst])
+            endif
+            if !empty(l:dsr)
+                call add(l:blks[-1], l:dsr)
+            endif
+        endif
+    endfor
+
+    " tabular buffer text
+    let l:text = []
+    for blk in blks
+        let l:line = blk[0]
+        if len(blk) >= 2
+            let l:line .= repeat(' ', l:max - strwidth(blk[0])) . ' : ' . blk[1]
+        endif
+        if len(blk) >= 3
+            let l:line .= repeat(' ', l:maxget - strwidth(blk[1])) . ' # ' . blk[2]
+        endif
+        call add(l:text, l:line)
+    endfor
+
+    call s:lyr.setBufs(v:t_list, l:text)
+endfunction
+" }}}
+
+" FUNCTION: s:pop(keepIndex) {{{
+function! s:pop()
+    let l:text = 's' . string(s:sel.top) . '. ' . s:cur.opt
+    call s:lyr.setInfo('centerText', l:text)
+    call s:lyr.setInfo('lastIndex', s:cur.idx)
+    call popc#ui#Create(s:lyr.name)
 endfunction
 " }}}
 
@@ -231,7 +279,7 @@ function! s:done(index, input, keep)
     if empty(s:cur.lst) && a:input == v:null
         return
     endif
-    let s:cur.idx = a:index
+    let s:cur.idx = a:index                 " save upper selection's index
     if !empty(s:cur.lst)
         let l:item = get(s:cur.dic, s:cur.lst[s:cur.idx], v:null)
     endif
@@ -282,6 +330,7 @@ endfunction
 
 " FUNCTION: popset#set#Modify(key, index) {{{
 function! popset#set#Modify(key, index)
+    let s:cur.idx = a:index                 " save upper selection's index
     " only sub-selection can be modified
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
@@ -327,17 +376,18 @@ endfunction
 " @param arg: A dictionary in following format,
 "   {
 "       \ 'opt' : string-list or string
-"       \ 'dsr' : string
+"       \ 'dsr' : string or funcref or lambda
 "       \ 'lst' : string-list
 "       \ 'dic' : string-dict or sub-dict
 "       \ 'cpl' : 'completion' used same to input()
 "       \ 'cmd' : function-name or funcref or lambda
 "       \ 'get' : function-name or funcref or lambda
+"       \ 'sub' : common dictionary of 'cpl', 'cmd', 'get' for sub-selection
 "       \ 'arg' : any type
 "   }
 " 'arg' MUST be NOT existed if no extra-args to cmd.
 function! popset#set#SubPopSelection(sopt, arg, ...)
-    let l:sel = s:unify(a:arg)
+    let l:sel = s:unify(a:arg)              " s:cur.idx had been set from s:done
     call s:sel.setTop('idx', s:cur.idx)     " save upper selection's index
     call s:sel.push(l:sel)
 
@@ -350,6 +400,7 @@ endfunction
 " FUNCTION: popset#set#PopSet(opt) {{{
 " use for popset internal data.
 function! popset#set#PopSet(opt)
+    let s:cur = deepcopy(s:default)
     call s:sel.clear()
     call popset#set#SubPopSelection('popset', popset#data#GetSel(a:opt))
 endfunction
@@ -358,6 +409,7 @@ endfunction
 " FUNCTION: popset#set#PopSelection(dict) {{{
 " use for popset external data.
 function! popset#set#PopSelection(dict)
+    let s:cur = deepcopy(s:default)
     call s:sel.clear()
     call popset#set#SubPopSelection('popset', a:dict)
 endfunction

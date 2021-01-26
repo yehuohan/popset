@@ -39,23 +39,24 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
 ```vim
 "   {
 "       'opt' : string-list
-"       'dsr' : string
 "       'lst' : string-list
 "       'dic' : string-dict or sub-dict
+"       'dsr' : string or funcref or lambda
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
+"       'sub' : common dictionary of 'cpl', 'cmd', 'get' for sub-selection
 "   }
 
 let g:Popset_SelectionData = [
     \{
         \ "opt" : ["filetype", "ft"],
-        \ "dsr" : 'When this option is set, the FileType autocommand event is triggered.',
         \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
         \ "dic" : {
                 \ "python" : "python script file",
                 \ "vim": "Vim script file",
                 \ },
+        \ "dsr" : 'When this option is set, the FileType autocommand event is triggered.',
         \ "cpl" : 'filetype',
         \ "cmd" : "SetEqual",
         \ "get" : "GetValue"
@@ -71,17 +72,19 @@ endfunction
 
 *`opt`:* `opt` is the option name list. `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will take two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset would only append the `lst` and `dic` but not override the existed one.
 
-*`dsr`:* `dsr` is the description of `opt`.
-
 *`lst`:* `lst` is the selection list of the `opt`.
 
 *`dic`:* `dic` is a description or sub-selection, who's key is from `lst`.
+
+*`dsr`:* `dsr` is the description of `opt`. If its type is funcref or lambda, it must return a string of description.
 
 *`cpl`:* `cpl` is completion for input selection value.
 
 *`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`.
 
-*`get`:* `get` is a function used to get the value of `opt`.
+*`get`:* `get` is a function used to get the value in string format of `opt`.
+
+*`sub`:* `sub` is a dictionary used to supply common `cpl`, `cmd`, `get` for sub-selection.
 
  - Show all the surpported options of popset:
 
@@ -103,19 +106,20 @@ All the surpported options is according to vim-help-doc.
 ```vim
 "   {
 "       'opt' : string-list or string
-"       'dsr' : string
 "       'lst' : string-list
 "       'dic' : string-dict or sub-dict
+"       'dsr' : string or funcref or lambda
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
+"       'sub' : common dictionary of 'cpl', 'cmd', 'get' for sub-selection
 "       'arg' : any type
 "   }
 ```
 
 *`opt`:* Descriptiong of selection which is **NOT** requeried be different from each other. When it's list, `opt[0]` is used.
 
-*`dsr`*, *`lst`*, *`dic`*, *`cpl`*, *`cmd`*, *`get`:* Similar to used in `popset internal data`.
+*`lst`*, *`dic`*, *`dsr`*, *`cpl`*, *`cmd`*, *`get`*, *`sub`:* Similar to used in `popset internal data`.
 
 *`arg`:* `arg` is the extra-args passed to `cmd`. If `cmd` doesn't need extra-args, the `dict` must **NOT** contain the `arg` key.
 
@@ -128,14 +132,14 @@ let s:menu = {
     \ "dic" : {
             \ "new file" : {
                 \ "opt" : ["menu new file"],
-                \ "dsr" : "create new file",
                 \ "lst" : ["a.py", "b.vim"],
+                \ "dsr" : "create new file",
                 \ "cmd" : {sopt, arg -> execute(":e " . arg)}
                 \ },
             \ "open file" : {
                 \ "opt" : ["menu open file"],
-                \ "dsr" : "open existed file",
                 \ "lst" : ["c.py", "d.vim"],
+                \ "dsr" : "open existed file",
                 \ "cmd" : {sopt, arg -> execute(":e " . arg)}
                 \ }
             \ },
@@ -168,6 +172,17 @@ call PopSelection({
         \ 'use_utils' : {'opt': 'use_utils' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
         \ },
     \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:null}
+    \ })
+" or
+call PopSelection({
+    \ 'opt' : 'select settings',
+    \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
+    \ 'dic' : {
+        \ 'set_os'    : {'lst': ['win', 'arch']},
+        \ 'use_utils' : {'lst': ['0', '1']     },
+        \ },
+    \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:null}
+    \ 'sub' : {'cmd': 'InitSet', 'get': 'InitGet'},
     \ })
 ```
 

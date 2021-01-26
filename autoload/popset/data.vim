@@ -6,7 +6,8 @@ let s:popset_sel = {
     \ 'lst' : [],
     \ 'dic' : {},
     \ 'cpl' : 'customlist,popset#data#GetSelList',
-    \ 'get' : ''
+    \ 'get' : v:null,
+    \ 'sub' : {},
     \ }
 
 
