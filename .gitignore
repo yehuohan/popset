@@ -3,13 +3,4 @@
 # .gitignogre for popset
 
 *.swp
-
-/*
-!/.gitignore
-!/*.md
-!/*.png
-!/*.gif
-!/LICENSE
-!/autoload
-!/doc/*.txt
-!/plugin
+tags

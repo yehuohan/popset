@@ -93,13 +93,13 @@ The dict must be in the format: >
 
     let l:dict = {
         \ 'opt' : <list or string>,
+        \ 'dsr' : '',
         \ 'lst' : [],
         \ 'dic' : {},
-        \ 'sub' : {},
         \ 'cpl' : '',
         \ 'cmd' : '',
-        \ 'arg' : <any type>,
         \ 'get' : '',
+        \ 'arg' : <any type>,
         \ }
 <
 
