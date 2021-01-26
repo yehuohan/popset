@@ -33,6 +33,7 @@ let s:cur = deepcopy(s:default)
 let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'],      'Execute (Space: preview execution)'],
     \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
+    \ ['popset#set#Modify', ['m','M'],           'Modify value of selection on current cursor'],
     \ ['popset#set#Back'  , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
     \ ]
 
@@ -276,6 +277,28 @@ function! popset#set#Input(key, index)
     let l:text = (empty(s:cur.lst) || a:key ==? 'i') ? '' : s:cur.lst[a:index]
     let l:sval = popc#ui#Input('Input: ', l:text, s:cur.cpl)
     call s:done(a:index, l:sval, a:key =~# '[ie]')
+endfunction
+" }}}
+
+" FUNCTION: popset#set#Modify(key, index) {{{
+function! popset#set#Modify(key, index)
+    " only sub-selection can be modified
+    if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
+        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
+        let l:text = (a:key ==# 'm' || l:ss.get != v:null) ? '' : l:ss.get(l:ss.opt)
+        let l:sval = popc#ui#Input('Input: ', l:text, l:ss.cpl)
+
+        call popc#ui#Destroy()
+        if has_key(l:ss, 'arg')
+            call l:ss.cmd(l:ss.opt, l:sval, l:ss.arg)
+        else
+            call l:ss.cmd(l:ss.opt, l:sval)
+        endif
+        call s:createBuffer()
+        call popc#ui#Create(s:lyr.name)
+    else
+        call popc#ui#Msg('The selection of current cursor is NOT support modification.')
+    endif
 endfunction
 " }}}
 
