@@ -5,9 +5,7 @@ let s:popset_sel = {
     \ 'opt' : ['popset'],
     \ 'lst' : [],
     \ 'dic' : {},
-    \ 'sub' : {},
     \ 'cpl' : 'customlist,popset#data#GetSelList',
-    \ 'cmd' : 'popset#set#SubPopSelection',
     \ 'get' : ''
     \ }
 
@@ -20,8 +18,7 @@ function! popset#data#Init()
     for l:item in s:popset_selection_data
         let l:sopt = l:item['opt'][0]
         call add(s:popset_sel.lst, l:sopt)
-        let s:popset_sel.dic[l:sopt] = get(l:item, 'dsr', '')
-        let s:popset_sel.sub[l:sopt] = l:item
+        let s:popset_sel.dic[l:sopt] = l:item
 
         " append the opt[1:-1] as shortname
         if (len(l:item['opt']) > 1)
@@ -35,13 +32,12 @@ function! popset#data#Init()
     if exists('g:Popset_SelectionData')
         for l:item in g:Popset_SelectionData
             let l:sopt = l:item['opt'][0]
-            if has_key(s:popset_sel.sub, l:sopt)
-                call extend(s:popset_sel.sub[l:sopt].lst, l:item.lst)
-                call extend(s:popset_sel.sub[l:sopt].dic, get(l:item, 'dic', {}), 'force')
+            if has_key(s:popset_sel.dic, l:sopt)
+                call extend(s:popset_sel.dic[l:sopt].lst, l:item.lst)
+                call extend(s:popset_sel.dic[l:sopt].dic, get(l:item, 'dic', {}), 'force')
             else
                 call add(s:popset_sel.lst, l:sopt)
-                let s:popset_sel.dic[l:sopt] = get(l:item, 'dsr', '')
-                let s:popset_sel.sub[l:sopt] = l:item
+                let s:popset_sel.dic[l:sopt] = l:item
             endif
 
             " append the opt[1:-1] as shortname
@@ -64,11 +60,11 @@ function! popset#data#GetSel(sopt)
     else
         " option is given in shortname
         if has_key(s:popset_sel_shortname, a:sopt)
-            return s:popset_sel.sub[s:popset_sel_shortname[a:sopt]]
+            return s:popset_sel.dic[s:popset_sel_shortname[a:sopt]]
         endif
         " option is given in fullname
-        if has_key(s:popset_sel.sub, a:sopt)
-            return s:popset_sel.sub[a:sopt]
+        if has_key(s:popset_sel.dic, a:sopt)
+            return s:popset_sel.dic[a:sopt]
         endif
     endif
     return {}
@@ -132,7 +128,7 @@ endfunction
 
 " FUNCTION: popset#data#GetOptValue(sopt) {{{
 function! popset#data#GetOptValue(sopt)
-    if has_key(s:popset_sel.sub, a:sopt) || has_key(s:popset_sel_shortname, a:sopt)
+    if has_key(s:popset_sel.dic, a:sopt) || has_key(s:popset_sel_shortname, a:sopt)
         if a:sopt ==# "colorscheme" || a:sopt ==# "colo"
             return g:colors_name
         else
