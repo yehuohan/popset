@@ -38,6 +38,7 @@ let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'],      'Execute (Space: preview execution)'],
     \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
     \ ['popset#set#Modify', ['m','M'],           'Modify value of selection on current cursor'],
+    \ ['popset#set#Toggle', ['n','p'],           'Next or Previous value of selection on current cursor'],
     \ ['popset#set#Back'  , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
     \ ]
 
@@ -359,6 +360,37 @@ function! popset#set#Modify(key, index)
             call s:createBuffer()
             call popc#ui#Create(s:lyr.name)
         endif
+    else
+        call popc#ui#Msg('The selection of current cursor is NOT support modification.')
+    endif
+endfunction
+" }}}
+
+" FUNCTION: popset#set#Toggle(key, index) {{{
+function! popset#set#Toggle(key, index)
+    let s:cur.idx = a:index                 " save upper selection's index
+    " only sub-selection can be modified
+    if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
+        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
+        let l:text = ''
+        if l:ss.get != v:null
+            call popc#ui#Toggle(0)
+            let l:text = l:ss.get(l:ss.opt)
+            call popc#ui#Toggle(1)
+        endif
+        let l:idx = index(l:ss.lst, l:text)
+        call popc#utils#Log('popset', 'toggle origin index: %d', l:idx)
+        let l:idx = (l:idx + ((a:key ==# 'n') ? 1 : -1)) % len(l:ss.lst)
+        let l:val = l:ss.lst[l:idx]
+
+        call popc#ui#Destroy()
+        if has_key(l:ss, 'arg')
+            call l:ss.cmd(l:ss.opt, l:val, l:ss.arg)
+        else
+            call l:ss.cmd(l:ss.opt, l:val)
+        endif
+        call s:createBuffer()
+        call popc#ui#Create(s:lyr.name)
     else
         call popc#ui#Msg('The selection of current cursor is NOT support modification.')
     endif
