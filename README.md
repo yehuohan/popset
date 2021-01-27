@@ -179,10 +179,10 @@ call PopSelection({
     \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
     \ 'dic' : {
         \ 'set_os'    : {'lst': ['win', 'arch']},
-        \ 'use_utils' : {'lst': ['0', '1']     },
+        \ 'use_utils' : {},
         \ },
     \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:null}
-    \ 'sub' : {'cmd': 'InitSet', 'get': 'InitGet'},
+    \ 'sub' : {'lst': ['0', '1'], 'cmd': 'InitSet', 'get': 'InitGet'},
     \ })
 ```
 

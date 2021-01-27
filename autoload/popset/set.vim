@@ -13,11 +13,11 @@ let s:sel = {
 "   opt = ''          " string-list or string, option name of selection
 "   lst = []          " string-list, list of selection
 "   dic = {}          " string-dict or sub-dict, dictionary of description or sub-selection
-"   dsr = ''          " string or funcref or lambda, description for opt
+"   dsr = ''          " string or funcref or lambda, description for opt, with format 'func(opt)'
 "   cpl = ''          " 'completion' used same to input()
-"   cmd = ''          " function-name or funcref or lambda, command function
-"   get = ''          " function-name or funcref or lambda, function to get option value
-"   sub = {}          " common dictionary of 'dsr', 'cpl', 'cmd', 'get' for sub-selection
+"   cmd = ''          " function-name or funcref or lambda, command function, with format 'func(opt, <args>)'
+"   get = ''          " function-name or funcref or lambda, function to get option value, with format 'func(opt)'
+"   sub = {}          " common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
 "   idx = 0           " current index of selection
 "   arg = <any type>  " 'arg' MUST be NOT existed if no extra-args to cmd.
 " }}}
@@ -135,10 +135,9 @@ endfunction
 " or provide @param a:1, which is the key of upper.dic
 function! s:unify(arg, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
-    " 'cpl', 'cmd', 'get' can be from s:cur.sub
+    " 'lst', 'dsr', 'cpl', 'cmd', 'get' can be from s:cur.sub
     " 'opt' can be from s:cur.lst[s:cur.idx]
     let l:sel = {
-        \ 'lst' : [],
         \ 'dic' : {},
         \ 'sub' : {},
         \ 'idx' : 0,
@@ -152,6 +151,10 @@ function! s:unify(arg, ...)
     else
         " the upper selection must has 'lst' for the sub-selection is from upper.dic
         let l:sel.opt = (a:0 >= 1) ? a:1 : s:cur.lst[s:cur.idx]
+    endif
+    "check lst
+    if !has_key(l:sel, 'lst')
+        let l:sel.lst = get(s:cur.sub, 'lst', [])
     endif
     " check dsr
     if !has_key(l:sel, 'dsr')
