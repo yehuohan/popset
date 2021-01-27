@@ -33,6 +33,7 @@ let s:default = {
     \ 'sub' : {},
     \ 'idx' : 0,
     \ }
+let s:cpllst = []     " set s:cpllst before popset#set#FuncLstCompletion for popc#ui#Input
 let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'],      'Execute (Space: preview execution)'],
     \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
@@ -110,7 +111,7 @@ endfunction
 function! popset#set#FuncLstCompletion(arglead, cmdline, cursorpos)
     let l:completekeys = []
 
-    for l:key in s:cur.lst
+    for l:key in s:cpllst
         if l:key =~ "^".a:arglead
             call add(l:completekeys, l:key)
         endif
@@ -323,6 +324,7 @@ endfunction
 
 " FUNCTION: popset#set#Input(key, index) {{{
 function! popset#set#Input(key, index)
+    let s:cpllst = s:cur.lst
     let l:text = (empty(s:cur.lst) || a:key ==? 'i') ? '' : s:cur.lst[a:index]
     let l:val = popc#ui#Input('Input: ', l:text, s:cur.cpl)
     if l:val != v:null
@@ -337,6 +339,7 @@ function! popset#set#Modify(key, index)
     " only sub-selection can be modified
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
+        let s:cpllst = l:ss.lst
         let l:text = (a:key ==# 'm' || l:ss.get != v:null) ? '' : l:ss.get(l:ss.opt)
         let l:val = popc#ui#Input('Input: ', l:text, l:ss.cpl)
 
