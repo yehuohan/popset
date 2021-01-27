@@ -10,15 +10,16 @@ let s:sel = {
     \ 'top' : -1,
     \ }
 " {{{ s:cur format
-"   opt = ''          " option name of selection
-"   dsr = ''          " description for opt
-"   lst = []          " list of selection
-"   dic = {}          " dictionary of description or sub-selection
-"   cpl = ''          " completion for input
-"   cmd = ''          " command function
-"   get = ''          " function to get option value
-"   sub = {}          " common 'dsr', 'cpl', 'cmd', 'get' for sub-selection
+"   opt = ''          " string-list or string, option name of selection
+"   lst = []          " string-list, list of selection
+"   dic = {}          " string-dict or sub-dict, dictionary of description or sub-selection
+"   dsr = ''          " string or funcref or lambda, description for opt
+"   cpl = ''          " 'completion' used same to input()
+"   cmd = ''          " function-name or funcref or lambda, command function
+"   get = ''          " function-name or funcref or lambda, function to get option value
+"   sub = {}          " common dictionary of 'dsr', 'cpl', 'cmd', 'get' for sub-selection
 "   idx = 0           " current index of selection
+"   arg = <any type>  " 'arg' MUST be NOT existed if no extra-args to cmd.
 " }}}
 let s:cur = {}
 let s:default = {
@@ -323,8 +324,10 @@ endfunction
 " FUNCTION: popset#set#Input(key, index) {{{
 function! popset#set#Input(key, index)
     let l:text = (empty(s:cur.lst) || a:key ==? 'i') ? '' : s:cur.lst[a:index]
-    let l:sval = popc#ui#Input('Input: ', l:text, s:cur.cpl)
-    call s:done(a:index, l:sval, a:key =~# '[ie]')
+    let l:val = popc#ui#Input('Input: ', l:text, s:cur.cpl)
+    if l:val != v:null
+        call s:done(a:index, l:val, a:key =~# '[ie]')
+    endif
 endfunction
 " }}}
 
@@ -335,16 +338,18 @@ function! popset#set#Modify(key, index)
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
         let l:text = (a:key ==# 'm' || l:ss.get != v:null) ? '' : l:ss.get(l:ss.opt)
-        let l:sval = popc#ui#Input('Input: ', l:text, l:ss.cpl)
+        let l:val = popc#ui#Input('Input: ', l:text, l:ss.cpl)
 
-        call popc#ui#Destroy()
-        if has_key(l:ss, 'arg')
-            call l:ss.cmd(l:ss.opt, l:sval, l:ss.arg)
-        else
-            call l:ss.cmd(l:ss.opt, l:sval)
+        if l:val != v:null
+            call popc#ui#Destroy()
+            if has_key(l:ss, 'arg')
+                call l:ss.cmd(l:ss.opt, l:val, l:ss.arg)
+            else
+                call l:ss.cmd(l:ss.opt, l:val)
+            endif
+            call s:createBuffer()
+            call popc#ui#Create(s:lyr.name)
         endif
-        call s:createBuffer()
-        call popc#ui#Create(s:lyr.name)
     else
         call popc#ui#Msg('The selection of current cursor is NOT support modification.')
     endif
@@ -373,19 +378,7 @@ endfunction
 " All sub-popset start from popset#set#SubPopSelection, so push s:sel here.
 
 " FUNCTION: popset#set#SubPopSelection(sopt, arg, ...) {{{
-" @param arg: A dictionary in following format,
-"   {
-"       \ 'opt' : string-list or string
-"       \ 'dsr' : string or funcref or lambda
-"       \ 'lst' : string-list
-"       \ 'dic' : string-dict or sub-dict
-"       \ 'cpl' : 'completion' used same to input()
-"       \ 'cmd' : function-name or funcref or lambda
-"       \ 'get' : function-name or funcref or lambda
-"       \ 'sub' : common dictionary of 'cpl', 'cmd', 'get' for sub-selection
-"       \ 'arg' : any type
-"   }
-" 'arg' MUST be NOT existed if no extra-args to cmd.
+" @param arg: A dictionary same to s:cur format
 function! popset#set#SubPopSelection(sopt, arg, ...)
     let l:sel = s:unify(a:arg)              " s:cur.idx had been set from s:done
     call s:sel.setTop('idx', s:cur.idx)     " save upper selection's index
