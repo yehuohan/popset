@@ -96,6 +96,7 @@ function! popset#set#Init()
                 \ 'bindCom' : 0,
                 \ 'fnPop' : function('popset#set#PopSet', ['popset']),
                 \ })
+    call popc#utils#Log('popset', 'popset layer was enabled')
 
     for md in s:mapsData
         call s:lyr.addMaps(md[0], md[1], md[2])
@@ -340,7 +341,12 @@ function! popset#set#Modify(key, index)
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
         let s:cpllst = l:ss.lst
-        let l:text = (a:key ==# 'm' || l:ss.get == v:null) ? '' : l:ss.get(l:ss.opt)
+        let l:text = ''
+        if a:key ==# 'M' && l:ss.get != v:null
+            call popc#ui#Toggle(0)
+            let l:text = l:ss.get(l:ss.opt)
+            call popc#ui#Toggle(1)
+        endif
         let l:val = popc#ui#Input('Input: ', l:text, l:ss.cpl)
 
         if l:val != v:null
