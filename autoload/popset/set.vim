@@ -340,7 +340,7 @@ function! popset#set#Modify(key, index)
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
         let s:cpllst = l:ss.lst
-        let l:text = (a:key ==# 'm' || l:ss.get != v:null) ? '' : l:ss.get(l:ss.opt)
+        let l:text = (a:key ==# 'm' || l:ss.get == v:null) ? '' : l:ss.get(l:ss.opt)
         let l:val = popc#ui#Input('Input: ', l:text, l:ss.cpl)
 
         if l:val != v:null
