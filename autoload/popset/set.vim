@@ -125,9 +125,9 @@ function! popset#set#FuncLstCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: s:funcCmd(sopt, arg) {{{
+" FUNCTION: s:funcCmd(sopt, ...) {{{
 " default function for s:cur.cmd
-function! s:funcCmd(sopt, arg)
+function! s:funcCmd(sopt, ...)
     call popc#ui#Msg('There''s nothing to execute')
 endfunction
 " }}}
