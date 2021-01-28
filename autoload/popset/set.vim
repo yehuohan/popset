@@ -10,16 +10,17 @@ let s:sel = {
     \ 'top' : -1,
     \ }
 " {{{ s:cur format
-"   opt = ''          " string-list or string, option name of selection
-"   lst = []          " string-list, list of selection
-"   dic = {}          " string-dict or sub-dict, dictionary of description or sub-selection
-"   dsr = ''          " string or funcref or lambda, description for opt, with format 'func(opt)'
-"   cpl = ''          " 'completion' used same to input()
-"   cmd = ''          " function-name or funcref or lambda, command function, with format 'func(opt, <args>)'
-"   get = ''          " function-name or funcref or lambda, function to get option value, with format 'func(opt)'
-"   sub = {}          " common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
-"   idx = 0           " current index of selection
-"   arg = <any type>  " 'arg' MUST be NOT existed if no extra-args to cmd.
+"   opt : string-list or string, option name of selection
+"   lst : string-list, list of selection
+"   dic : string-dict or sub-dict, dictionary of description or sub-selection
+"   dsr : string or funcref or lambda, description for opt, with format 'func(opt)'
+"   cpl : 'completion' used same to input()
+"   cmd : function-name or funcref or lambda, command function, with format 'func(opt, sel, <args>)'
+"   get : function-name or funcref or lambda, function to get option value, with format 'func(opt)'
+"   sub : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
+"   idx : current index of selection
+"   arg : any type, 'arg' MUST be NOT existed if no extra-args to cmd.
+"   onCR : function-name or funcref or lambda, response to key <CR> prior to 'cmd', with format 'func(opt, <args>)'
 " }}}
 let s:cur = {}
 let s:default = {
@@ -32,10 +33,11 @@ let s:default = {
     \ 'get' : v:null,
     \ 'sub' : {},
     \ 'idx' : 0,
+    \ 'onCR' : v:null,
     \ }
 let s:cpllst = []     " set s:cpllst before popset#set#FuncLstCompletion for popc#ui#Input
 let s:mapsData = [
-    \ ['popset#set#Load'  , ['CR','Space'],      'Execute (Space: preview execution)'],
+    \ ['popset#set#Load'  , ['CR','Space'],      'Execute cmd (Space: preview execution) or onCR'],
     \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
     \ ['popset#set#Modify', ['m','M'],           'Modify value of selection on current cursor'],
     \ ['popset#set#Toggle', ['n','p'],           'Next or Previous value of selection on current cursor'],
@@ -141,6 +143,7 @@ function! s:unify(arg, ...)
         \ 'dic' : {},
         \ 'sub' : {},
         \ 'idx' : 0,
+        \ 'onCR' : v:null,
         \ }
     call extend(l:sel, l:arg, 'force')
     " check opt
@@ -179,6 +182,10 @@ function! s:unify(arg, ...)
         endif
     else
         let l:sel.get = has_key(s:cur.sub, 'get') ? function(s:cur.sub.get) : v:null
+    endif
+    " check onCR
+    if type(l:sel.onCR) == v:t_string
+        let l:sel.onCR = function(l:sel.onCR)
     endif
 
     return l:sel
@@ -323,7 +330,16 @@ endfunction
 
 " FUNCTION: popset#set#Load(key, index) {{{
 function! popset#set#Load(key, index)
-    call s:done(a:index, v:null, a:key ==# 'Space')
+    if a:key ==# 'CR' && s:cur.onCR != v:null
+        call popc#ui#Destroy()
+        if has_key(s:cur, 'arg')
+            call s:cur.onCR(s:cur.opt, s:cur.arg)
+        else
+            call s:cur.onCR(s:cur.opt)
+        endif
+    else
+        call s:done(a:index, v:null, a:key ==# 'Space')
+    endif
 endfunction
 " }}}
 

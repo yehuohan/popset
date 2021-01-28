@@ -101,6 +101,7 @@ The dict must be in the format: >
         \ 'get' : '',
         \ 'arg' : <any type>,
         \ 'sub' : {}
+        \ 'onCR': '',
         \ }
 <
 

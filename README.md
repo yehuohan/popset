@@ -45,7 +45,8 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'cpl', 'cmd', 'get' for sub-selection
+"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
+"       'onCR' : function-name or funcref or lambda
 "   }
 
 let g:Popset_SelectionData = [
@@ -76,15 +77,17 @@ endfunction
 
 *`dic`:* `dic` is a description or sub-selection, who's key is from `lst`.
 
-*`dsr`:* `dsr` is the description of `opt`. If its type is funcref or lambda, it must return a string of description.
+*`dsr`:* `dsr` is the description of `opt`. If its type is funcref or lambda, it must return a string of description. Function is in format 'func(opt)'.
 
 *`cpl`:* `cpl` is completion for input selection value.
 
-*`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`.
+*`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Function is in format 'func(opt, sel, <args>)'.
 
-*`get`:* `get` is a function used to get the value in string format of `opt`.
+*`get`:* `get` is a function used to get the value in string format of `opt`. Function is in format 'func(opt)'.
 
 *`sub`:* `sub` is a dictionary used to supply common `cpl`, `cmd`, `get` for sub-selection.
+
+*`onCR`:* `onCR` is a function used to response to key <CR> prior to 'cmd'. Function is in format 'func(opt, <args>)'.
 
  - Show all the surpported options of popset:
 
@@ -112,14 +115,15 @@ All the surpported options is according to vim-help-doc.
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'cpl', 'cmd', 'get' for sub-selection
+"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
 "       'arg' : any type
+"       'onCR' : function-name or funcref or lambda
 "   }
 ```
 
 *`opt`:* Descriptiong of selection which is **NOT** requeried be different from each other. When it's list, `opt[0]` is used.
 
-*`lst`*, *`dic`*, *`dsr`*, *`cpl`*, *`cmd`*, *`get`*, *`sub`:* Similar to used in `popset internal data`.
+*`lst`*, *`dic`*, *`dsr`*, *`cpl`*, *`cmd`*, *`get`*, *`sub`*, *`onCR`:* Similar to used in `popset internal data`.
 
 *`arg`:* `arg` is the extra-args passed to `cmd`. If `cmd` doesn't need extra-args, the `dict` must **NOT** contain the `arg` key.
 
@@ -161,9 +165,11 @@ endfunction
 function! InitGet(sopt)
     return s:gset[a:sopt]
 endfunction
-function! InitSave()
+function! InitSave(...)
     " add code rely on s:gset
 endfunction
+
+" start selecting with
 call PopSelection({
     \ 'opt' : 'select settings',
     \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
@@ -176,13 +182,13 @@ call PopSelection({
 " or
 call PopSelection({
     \ 'opt' : 'select settings',
-    \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
+    \ 'lst' : sort(keys(s:gset)),
     \ 'dic' : {
         \ 'set_os'    : {'lst': ['win', 'arch']},
         \ 'use_utils' : {},
         \ },
-    \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:null}
     \ 'sub' : {'lst': ['0', '1'], 'cmd': 'InitSet', 'get': 'InitGet'},
+    \ 'onCR': function('InitSave'),
     \ })
 ```
 
