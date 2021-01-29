@@ -400,16 +400,17 @@ function! popset#set#Toggle(key, index)
         let l:idx = index(l:ss.lst, l:text)
         call popc#utils#Log('popset', 'toggle origin index: %d', l:idx)
         let l:idx = (l:idx + ((a:key ==# 'n') ? 1 : -1)) % len(l:ss.lst)
-        let l:val = l:ss.lst[l:idx]
-
-        call popc#ui#Destroy()
-        if has_key(l:ss, 'arg')
-            call l:ss.cmd(l:ss.opt, l:val, l:ss.arg)
-        else
-            call l:ss.cmd(l:ss.opt, l:val)
+        if !empty(l:ss.lst)
+            let l:val = l:ss.lst[l:idx]
+            call popc#ui#Destroy()
+            if has_key(l:ss, 'arg')
+                call l:ss.cmd(l:ss.opt, l:val, l:ss.arg)
+            else
+                call l:ss.cmd(l:ss.opt, l:val)
+            endif
+            call s:createBuffer()
+            call popc#ui#Create(s:lyr.name)
         endif
-        call s:createBuffer()
-        call popc#ui#Create(s:lyr.name)
     else
         call popc#ui#Msg('The selection of current cursor is NOT support modification.')
     endif
