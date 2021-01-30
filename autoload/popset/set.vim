@@ -36,6 +36,7 @@ let s:default = {
     \ 'onCR' : v:null,
     \ }
 let s:cpllst = []     " set s:cpllst before popset#set#FuncLstCompletion for popc#ui#Input
+let s:inited = 0
 let s:mapsData = [
     \ ['popset#set#Load'  , ['CR','Space'],      'Execute cmd (Space: preview execution) or onCR'],
     \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
@@ -43,7 +44,6 @@ let s:mapsData = [
     \ ['popset#set#Toggle', ['n','p'],           'Next or Previous value of selection on current cursor'],
     \ ['popset#set#Back'  , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
     \ ]
-
 
 " SECTION: dictionary function {{{1
 
@@ -105,8 +105,6 @@ function! popset#set#Init()
         call s:lyr.addMaps(md[0], md[1], md[2])
     endfor
     unlet! s:mapsData
-
-    call popset#data#Init()
 endfunction
 " }}}
 
@@ -454,6 +452,10 @@ endfunction
 " FUNCTION: popset#set#PopSet(opt) {{{
 " use for popset internal data.
 function! popset#set#PopSet(opt)
+    if !s:inited
+        let s:inited = 1
+        call popset#data#Init()
+    endif
     let s:cur = deepcopy(s:default)
     call s:sel.clear()
     call popset#set#SubPopSelection('popset', popset#data#GetSel(a:opt))
