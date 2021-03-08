@@ -7,10 +7,6 @@ let s:popset_sel = {
     \ 'dic' : {},
     \ 'cpl' : 'customlist,popset#data#GetSelList',
     \ 'get' : v:null,
-    \ 'sub' : {
-        \ 'cmd' : 'popset#data#SetEqual',
-        \ 'get' : 'popset#data#GetOptValue',
-        \ },
     \ }
 
 
@@ -164,12 +160,16 @@ let s:popset_selection_data = [
         \ 'lst' : ['dark', 'light'],
         \ 'dic' : {'data': 'dark background color',
                  \ 'ligth': 'light background color'},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['cmdheight', 'ch'],
         \ 'dsr' : 'Number of screen lines to use for the command-line.',
         \ 'lst' : [1, 2, 3, 4, 5],
         \ 'dic' : {},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['colorscheme', 'colo'],
@@ -177,6 +177,7 @@ let s:popset_selection_data = [
         \ 'lst' : s:getColorscheme($VIMRUNTIME.'/colors/*.vim'),
         \ 'dic' : {},
         \ 'cmd' : 'popset#data#SetExecute',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['completeopt', 'cot'],
@@ -196,6 +197,8 @@ let s:popset_selection_data = [
                 \ 'menu,noselect'    : 'Do not select a match in the menu, force the user to select one from the menu.',
                 \ 'menuone,noselect' : 'Do not select a match in the menu, force the user to select one from the menu.',
                 \ },
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['conceallevel', 'cole'],
@@ -207,6 +210,8 @@ let s:popset_selection_data = [
                 \ '2' : 'Concealed text is completely hidden unless it has a custom replacement character defined.',
                 \ '3' : 'Concealed text is completely hidden.',
                 \},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['fileencoding', 'fenc'],
@@ -236,6 +241,8 @@ let s:popset_selection_data = [
                 \ 'utf-16'  : 'ucs-2 extended with double-words for more characters',
                 \ 'utf-16le': 'like utf-16, little endian',
                 \},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['fileformat', 'ff'],
@@ -244,12 +251,16 @@ let s:popset_selection_data = [
         \ 'dic' : {'dos' : 'set EOL to <CR><LF>',
                  \ 'unix' : 'set EOL to <LF>',
                  \ 'mac' : 'set EOL to <CR>'},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['foldcolumn', 'fdc'],
         \ 'dsr' : 'Column indicates open and closed folds.',
         \ 'lst' : ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
         \ 'dic' : {},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['foldmethod', 'fdm'],
@@ -262,29 +273,37 @@ let s:popset_selection_data = [
                 \ 'marker' : 'Markers are used to specify folds.',
                 \ 'syntax' : 'Syntax highlighting items specify folds.',
                 \ 'diff'   : 'Fold text that is not changed.',
-                \},
+                \ },
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['laststatus', 'ls'],
         \ 'dsr' : 'Determine when the last window will have a status line.',
         \ 'lst' : [0, 1, 2],
-        \ 'dic' :{
+        \ 'dic' : {
                 \ '0' : 'never',
                 \ '1' : 'only if there are at least two windows',
                 \ '2' : 'always',
-                \},
+                \ },
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['linespace', 'lsp'],
         \ 'dsr' : 'Number of pixel lines inserted between characters.',
         \ 'lst' : [-2, -1, 0, 1, 2, 3, 4, 5],
         \ 'dic' :{},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['scrolloff', 'so'],
         \ 'dsr' : 'Minimal number of screen lines to keep above and below the cursor.',
         \ 'lst' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         \ 'dic' :{},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['signcolumn', 'scl'],
@@ -294,24 +313,32 @@ let s:popset_selection_data = [
                 \ 'auto' : 'only when there is a sign to display',
                 \ 'no'   : 'never',
                 \ 'yes'  : 'always',},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['shiftwidth', 'sw'],
         \ 'dsr' : 'Number of spaces to use for each step of (auto)indent.',
         \ 'lst' : [2, 3, 4, 8, 16],
         \ 'dic' :{},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['softtabstop', 'sts'],
         \ 'dsr' : 'Number of spaces that a <Tab> counts for while performing editing operations',
         \ 'lst' : [2, 3, 4, 8, 16],
         \ 'dic' :{},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['tabstop', 'ts'],
         \ 'dsr' : 'Number of spaces that a <Tab> in the file counts for.',
         \ 'lst' : [2, 3, 4, 8, 16],
         \ 'dic' :{},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \{
         \ 'opt' : ['virtualedit', 've'],
@@ -324,6 +351,8 @@ let s:popset_selection_data = [
                 \ 'all'     : 'Allow virtual editing in all modes.',
                 \ 'onemore' : 'Allow the cursor to move just past the end of the line.',
                 \},
+        \ 'cmd' : 'popset#data#SetEqual',
+        \ 'get' : 'popset#data#GetOptValue',
     \},
     \]
 
