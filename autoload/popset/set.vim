@@ -25,7 +25,7 @@ let s:sel = {
 let s:cur = {}
 let s:default = {
     \ 'opt' : '',
-    \ 'lst' : [],
+    \ 'lst' : ['Nothing'],
     \ 'dic' : {},
     \ 'dsr' : v:null,
     \ 'cpl' : 'customlist,popset#set#FuncLstCompletion',
@@ -131,8 +131,9 @@ endfunction
 " }}}
 
 " FUNCTION: s:unify(arg, ...) {{{
-" must have set s:cur.idx before call s:unify,
-" or provide @param a:1, which is the key of upper.dic
+" get unified sub-selection entry which is called l:sel in function.
+" as for sub-selection, s:cur is called upper selection。
+" before call s:unify, must have s:cur.idx set, or provide @param a:1 as l:sel.opt.
 function! s:unify(arg, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
     " 'lst', 'dsr', 'cpl', 'cmd', 'get' can be from s:cur.sub
@@ -150,7 +151,7 @@ function! s:unify(arg, ...)
             let l:sel.opt = empty(l:sel.opt) ? '' : l:sel.opt[0]
         endif
     else
-        " the upper selection must has 'lst' for the sub-selection is from upper.dic
+        " the upper selection must has 'lst'
         let l:sel.opt = (a:0 >= 1) ? a:1 : s:cur.lst[s:cur.idx]
     endif
     "check lst
@@ -225,7 +226,7 @@ function! s:createBuffer()
         if has_key(s:cur.dic, lst)
             let l:dsr = ''
             if type(s:cur.dic[lst]) == v:t_dict
-                " insert value of sub-selection from 'get'
+                " use value of sub-selection from 'get'
                 let l:ss = s:unify(s:cur.dic[lst], lst)
                 if l:ss.get != v:null
                     let l:val = l:ss.get(l:ss.opt)
