@@ -205,7 +205,6 @@ function! s:createBuffer()
         let l:val = s:cur.get(s:cur.opt)
         let l:max += 4
     else
-        unlet! l:val
         let l:max += 2
     endif
 
@@ -214,15 +213,18 @@ function! s:createBuffer()
     let l:maxget = 0
     for lst in s:cur.lst
         call add(l:blks, [])
-        " show lst
+        " show lst block
         let l:txt = '  '
-        if s:cur.get != v:null
-            let l:txt .= ((l:val ==# lst) ? s:conf.symbols.WIn : ' ') . ' '
+        if s:cur.get != v:null && type(l:val) == type(lst)
+            " compare optiont value only when get the same type
+            let l:txt .= ((l:val == lst) ? s:conf.symbols.WIn : ' ') . ' '
         endif
-        let l:txt .= lst
+        " Do NOT use `.=` to avoid some auto string converting error case such
+        " as `l:txt .= v:true`
+        let l:txt = l:txt . lst
         call add(l:blks[-1], l:txt)
 
-        " show dic
+        " show dic block
         if has_key(s:cur.dic, lst)
             let l:dsr = ''
             if type(s:cur.dic[lst]) == v:t_dict
@@ -230,9 +232,13 @@ function! s:createBuffer()
                 let l:ss = s:unify(s:cur.dic[lst], lst)
                 if l:ss.get != v:null
                     let l:val = l:ss.get(l:ss.opt)
-                    let l:wid = strwidth(l:val)
-                    let l:maxget = (l:wid > l:maxget) ? l:wid : l:maxget
-                    call add(l:blks[-1], l:val)
+                    " dict and list is not well show as value block
+                    if type(l:val) != v:t_dict && type(l:val) != v:t_list
+                        let l:wid = strwidth(l:val)
+                        let l:maxget = (l:wid > l:maxget) ? l:wid : l:maxget
+                        " show dic value block
+                        call add(l:blks[-1], l:val)
+                    endif
                 endif
 
                 " use dsr of sub-selection's
@@ -253,6 +259,7 @@ function! s:createBuffer()
                 let l:dsr = string(s:cur.dic[lst])
             endif
             if !empty(l:dsr)
+                " show dic discription block
                 call add(l:blks[-1], l:dsr)
             endif
         endif

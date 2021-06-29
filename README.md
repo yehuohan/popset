@@ -83,7 +83,7 @@ endfunction
 
 *`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Function is in format 'func(opt, sel, [args])'.
 
-*`get`:* `get` is a function used to get the value in string format of `opt`. Function is in format 'func(opt)'.
+*`get`:* `get` is a function used to get the value of `opt`. Function is in format 'func(opt)'.
 
 *`sub`:* `sub` is a dictionary used to supply common `cpl`, `cmd`, `get` for sub-selection.
 
