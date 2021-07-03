@@ -1,26 +1,19 @@
 
- - [Installation](#1)
- - [Command Usage](#3)
+ - [Command](#3)
     - [PopSet](#3.1)
- - [Function Usage](#4)
+ - [Function](#4)
     - [PopSelection](#4.1)
  - [Help doc](#5)
 
 ---
 
-**Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing function with args and so on.
-
-The lastest **Popset** is implementated with [popc](https://github.com/yehuohan/popc). (The old implementation is in old-master branch)
-
-
----
-<h2 id="1">Installation</h2>
+**Popset** is a vim plugin to `Pop selections for operation`, which will be convinient for setting vim options, executing function with args and so on. **Popset** is implementated with [popc](https://github.com/yehuohan/popc).
 
 For vim-plug, add to your `.vimrc`:
 
 ```vim
+Plug 'yehuohan/popc'        " Must add before popset
 Plug 'yehuohan/popset'
-Plug 'yehuohan/popc'
 ```
 
 ---
@@ -127,7 +120,7 @@ All the surpported options is according to vim-help-doc.
 
 *`arg`:* `arg` is the extra-args passed to `cmd`. If `cmd` doesn't need extra-args, the `dict` must **NOT** contain the `arg` key.
 
-A example with sub-selection:
+- A example with sub-selection:
 
 ```vim
 let s:menu = {
@@ -152,45 +145,11 @@ let s:menu = {
 call PopSelection(s:menu)
 ```
 
-Use selection for setttings example:
+- A example of selection for setttings from [use.vim](https://github.com/yehuohan/dotconfigs/blob/master/vim/.vim/viml/use.vim):
 
-```vim
-let s:gset = {
-    \ 'set_os'        : v:null,
-    \ 'use_utils'     : 1,
-    \ }
-function! InitSet(sopt, arg)
-    let s:gset[a:sopt] = a:arg
-endfunction
-function! InitGet(sopt)
-    return s:gset[a:sopt]
-endfunction
-function! InitSave(...)
-    " add code rely on s:gset
-endfunction
-
-" start selecting with
-call PopSelection({
-    \ 'opt' : 'select settings',
-    \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
-    \ 'dic' : {
-        \ 'set_os'    : {'opt': 'set_os'    , 'lst': ['win', 'arch'], 'cmd': 'InitSet', 'get': 'InitGet'},
-        \ 'use_utils' : {'opt': 'use_utils' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-        \ },
-    \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? InitSave() : v:null}
-    \ })
-" or
-call PopSelection({
-    \ 'opt' : 'select settings',
-    \ 'lst' : sort(keys(s:gset)),
-    \ 'dic' : {
-        \ 'set_os'    : {'lst': ['win', 'arch']},
-        \ 'use_utils' : {},
-        \ },
-    \ 'sub' : {'lst': ['0', '1'], 'cmd': 'InitSet', 'get': 'InitGet'},
-    \ 'onCR': function('InitSave'),
-    \ })
-```
+<div align="center">
+<img alt="use" src="use.gif"  width=75% height=75% />
+</div>
 
 ---
 <h2 id="5">Help doc</h2>
