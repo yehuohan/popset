@@ -31,7 +31,7 @@ Plug 'yehuohan/popc'
 There is only one command `PopSet`, which is similar to `set` command, in popset. What can be set by `PopSet` is all in `popset internal data`.
 
 <div align="center">
-<img alt="Popset" src="https://github.com/yehuohan/popset/blob/master/popset.gif"  width=75% height=75% />
+<img alt="Popset" src="popset.gif"  width=75% height=75% />
 </div>
 
  - Add selections to `g:Popset_SelectionData` as `popset internal data`:
@@ -195,4 +195,4 @@ call PopSelection({
 ---
 <h2 id="5">Help doc</h2>
 
-More help about popset please see [popset.txt](https://github.com/yehuohan/popset/blob/master/doc/popset.txt) and [popc.txt](https://github.com/yehuohan/popc/blob/master/doc/popc.txt)
+More help about popset please see [popset.txt](doc/popset.txt) and [popc.txt](https://github.com/yehuohan/popc/blob/master/doc/popc.txt)
