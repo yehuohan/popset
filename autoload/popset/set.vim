@@ -353,7 +353,8 @@ endfunction
 function! popset#set#Input(key, index)
     let s:cpllst = s:cur.lst
     let l:text = (empty(s:cur.lst) || a:key ==? 'i') ? '' : s:cur.lst[a:index]
-    let l:val = popc#ui#Input('Input: ', l:text, s:cur.cpl)
+    let l:prompt = (a:key ==? 'i') ? 'Input: ' : 'Edit: '
+    let l:val = popc#ui#Input(l:prompt, l:text, s:cur.cpl)
     if l:val != v:null
         call s:done(a:index, l:val, a:key =~# '[ie]')
     endif
@@ -373,7 +374,7 @@ function! popset#set#Modify(key, index)
             let l:text = l:ss.get(l:ss.opt)
             call popc#ui#Toggle(1)
         endif
-        let l:val = popc#ui#Input('Input: ', l:text, l:ss.cpl)
+        let l:val = popc#ui#Input('Modify: ', l:text, l:ss.cpl)
 
         if l:val != v:null
             call popc#ui#Destroy()
