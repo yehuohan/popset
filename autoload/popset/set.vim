@@ -308,7 +308,11 @@ function! s:done(index, input, keep)
     endif
 
     " done for sub-dict or string-list or input-string
+    let l:keep = a:keep
     if type(l:item) == v:t_dict
+        " popset#set#SubPopSelection will call s:createBuffer() and s:pop,
+        " so let keep=0 to avoid duplicated calling s:createBuffer() and s:pop.
+        let l:keep = 0
         let l:Fn = function('popset#set#SubPopSelection')
         let l:arg = l:item
     else
@@ -325,7 +329,7 @@ function! s:done(index, input, keep)
     endif
 
     " keep displaying selection
-    if a:keep
+    if l:keep
         if s:cur.get != v:null
             call s:createBuffer()
         endif
