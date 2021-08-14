@@ -215,8 +215,8 @@ function! s:createBuffer()
         call add(l:blks, [])
         " show lst block
         let l:txt = '  '
-        if s:cur.get != v:null && type(l:val) == type(lst)
-            " compare optiont value only when get the same type
+        if s:cur.get != v:null && type(get(s:cur.dic, lst, '')) != v:t_dict
+            " compare option value only when lst is not a sub-selection
             let l:txt .= ((l:val == lst) ? s:conf.symbols.WIn : ' ') . ' '
         endif
         " Do NOT use `.=` to avoid some auto string converting error case such
