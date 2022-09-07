@@ -99,7 +99,6 @@ The dict must be in the format: >
         \ 'cpl' : '',
         \ 'cmd' : '',
         \ 'get' : '',
-        \ 'arg' : <any type>,
         \ 'sub' : {}
         \ 'onCR': '',
         \ }

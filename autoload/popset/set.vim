@@ -15,12 +15,11 @@ let s:sel = {
 "   dic : string-dict or sub-dict, dictionary of description or sub-selection
 "   dsr : string or funcref or lambda, description for opt, with format 'func(opt)'
 "   cpl : 'completion' used same to input()
-"   cmd : function-name or funcref or lambda, command function, with format 'func(opt, sel, <args>)'
-"   get : function-name or funcref or lambda, function to get option value, with format 'func(opt)'
-"   sub : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
+"   cmd : callable function to execute command with signature 'func(opt, sel)'
+"   get : callable function to get option value with signature 'func(opt)'
+"   sub : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' for sub-selection
+"   onCR : callable function responses to key <CR> prior to 'cmd', with signature 'func(opt)'
 "   idx : current index of selection
-"   arg : any type, 'arg' MUST be NOT existed if no extra-args to cmd.
-"   onCR : function-name or funcref or lambda, response to key <CR> prior to 'cmd', with format 'func(opt, <args>)'
 " }}}
 let s:cur = {}
 let s:default = {
@@ -130,19 +129,27 @@ function! s:funcCmd(sopt, ...)
 endfunction
 " }}}
 
+" FUNCTION: s:callable(item) {{{
+" return a callable function from function-name or funcref or lambda item
+function! s:callable(item)
+    return type(a:item) == v:t_string ? function(a:item) : a:item
+endfunction
+" }}}
+
 " FUNCTION: s:unify(arg, ...) {{{
 " get unified sub-selection entry which is called l:sel in function.
 " as for sub-selection, s:cur is called upper selection。
 " before call s:unify, must have s:cur.idx set, or provide @param a:1 as l:sel.opt.
-function! s:unify(arg, ...)
+" @param arg: original sub-selection entry
+" @param full: get a full sub-selection entry or not
+function! s:unify(arg, full, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
-    " 'lst', 'dsr', 'cpl', 'cmd', 'get' can be from s:cur.sub
+    " 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' can be from s:cur.sub
     " 'opt' can be from s:cur.lst[s:cur.idx]
     let l:sel = {
         \ 'dic' : {},
         \ 'sub' : {},
         \ 'idx' : 0,
-        \ 'onCR' : v:null,
         \ }
     call extend(l:sel, l:arg, 'force')
     " check opt
@@ -167,24 +174,16 @@ function! s:unify(arg, ...)
         let l:sel.cpl = get(s:cur.sub, 'cpl', 'customlist,popset#set#FuncLstCompletion')
     endif
     " check cmd
-    if has_key(l:sel, 'cmd')
-        if type(l:sel.cmd) == v:t_string
-            let l:sel.cmd = function(l:sel.cmd)
-        endif
-    else
-        let l:sel.cmd = function(get(s:cur.sub, 'cmd', 's:funcCmd'))
-    endif
+    let l:sel.cmd = has_key(l:sel, 'cmd') ? s:callable(l:sel.cmd)
+        \ : s:callable(get(s:cur.sub, 'cmd', 's:funcCmd'))
     " check get
-    if has_key(l:sel, 'get')
-        if type(l:sel.get) == v:t_string
-            let l:sel.get = function(l:sel.get)
-        endif
-    else
-        let l:sel.get = has_key(s:cur.sub, 'get') ? function(s:cur.sub.get) : v:null
-    endif
-    " check onCR
-    if type(l:sel.onCR) == v:t_string
-        let l:sel.onCR = function(l:sel.onCR)
+    let l:sel.get = has_key(l:sel, 'get') ? s:callable(l:sel.get)
+        \ : s:callable(get(s:cur.sub, 'get', v:null))
+    if a:full
+        " check onCR
+        let l:sel.onCR = has_key(l:sel, 'onCR') ? s:callable(l:sel.onCR)
+            \ : has_key(s:cur.sub, 'onCR') ? s:callable(s:cur.sub.onCR)
+            \ : s:callable(get(s:cur, 'onCR', v:null))
     endif
 
     return l:sel
@@ -229,7 +228,7 @@ function! s:createBuffer()
             let l:dsr = ''
             if type(s:cur.dic[lst]) == v:t_dict
                 " use value of sub-selection from 'get'
-                let l:ss = s:unify(s:cur.dic[lst], lst)
+                let l:ss = s:unify(s:cur.dic[lst], v:false, lst)
                 if l:ss.get != v:null
                     let l:val = l:ss.get(l:ss.opt)
                     " dict and list is not well show as value block
@@ -295,7 +294,8 @@ endfunction
 " @param index: The selection index
 " @param input: The selection inputed by user if it's not v:null
 " @param keep: Keep displaying selection after done
-function! s:done(index, input, keep)
+" @param ensub: Enable sub-selection or not
+function! s:done(index, input, keep, ensub)
     if empty(s:cur.lst) && a:input == v:null
         return
     endif
@@ -313,7 +313,7 @@ function! s:done(index, input, keep)
         " popset#set#SubPopSelection will call s:createBuffer() and s:pop,
         " so let keep=0 to avoid duplicated calling s:createBuffer() and s:pop.
         let l:keep = 0
-        let l:Fn = function('popset#set#SubPopSelection')
+        let l:Fn = a:ensub ? function('popset#set#SubPopSelection') : v:null
         let l:arg = l:item
     else
         let l:Fn = s:cur.cmd
@@ -322,9 +322,7 @@ function! s:done(index, input, keep)
 
     " callback with selection
     call popc#ui#Destroy()
-    if has_key(s:cur, 'arg')
-        call l:Fn(s:cur.opt, l:arg, s:cur.arg)
-    else
+    if l:Fn != v:null
         call l:Fn(s:cur.opt, l:arg)
     endif
 
@@ -341,14 +339,10 @@ endfunction
 " FUNCTION: popset#set#Load(key, index) {{{
 function! popset#set#Load(key, index)
     if a:key ==# 'CR' && s:cur.onCR != v:null
-        call popc#ui#Destroy()
-        if has_key(s:cur, 'arg')
-            call s:cur.onCR(s:cur.opt, s:cur.arg)
-        else
-            call s:cur.onCR(s:cur.opt)
-        endif
+        call s:done(a:index, v:null, v:false, v:false)
+        call s:cur.onCR(s:cur.opt)
     else
-        call s:done(a:index, v:null, a:key ==# 'Space')
+        call s:done(a:index, v:null, a:key ==# 'Space', v:true)
     endif
 endfunction
 " }}}
@@ -360,7 +354,7 @@ function! popset#set#Input(key, index)
     let l:prompt = (a:key ==? 'i') ? 'Input: ' : 'Edit: '
     let l:val = popc#ui#Input(l:prompt, l:text, s:cur.cpl)
     if l:val != v:null
-        call s:done(a:index, l:val, a:key =~# '[ie]')
+        call s:done(a:index, l:val, a:key =~# '[ie]', v:true)
     endif
 endfunction
 " }}}
@@ -370,7 +364,7 @@ function! popset#set#Modify(key, index)
     let s:cur.idx = a:index                 " save upper selection's index
     " only sub-selection can be modified
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
-        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
+        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]], v:false)
         let s:cpllst = l:ss.lst
         let l:text = ''
         if a:key ==# 'M' && l:ss.get != v:null
@@ -382,11 +376,7 @@ function! popset#set#Modify(key, index)
 
         if l:val != v:null
             call popc#ui#Destroy()
-            if has_key(l:ss, 'arg')
-                call l:ss.cmd(l:ss.opt, l:val, l:ss.arg)
-            else
-                call l:ss.cmd(l:ss.opt, l:val)
-            endif
+            call l:ss.cmd(l:ss.opt, l:val)
             call s:createBuffer()
             call popc#ui#Create(s:lyr.name)
         endif
@@ -401,7 +391,7 @@ function! popset#set#Toggle(key, index)
     let s:cur.idx = a:index                 " save upper selection's index
     " only sub-selection can be modified
     if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
-        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]])
+        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]], v:false)
         let l:text = ''
         if l:ss.get != v:null
             call popc#ui#Toggle(0)
@@ -414,11 +404,7 @@ function! popset#set#Toggle(key, index)
         if !empty(l:ss.lst)
             let l:val = l:ss.lst[l:idx]
             call popc#ui#Destroy()
-            if has_key(l:ss, 'arg')
-                call l:ss.cmd(l:ss.opt, l:val, l:ss.arg)
-            else
-                call l:ss.cmd(l:ss.opt, l:val)
-            endif
+            call l:ss.cmd(l:ss.opt, l:val)
             call s:createBuffer()
             call popc#ui#Create(s:lyr.name)
         endif
@@ -449,10 +435,10 @@ endfunction
 " All popset start from popset#set#PopSet or popset#set#PopSelection, so clear s:sel here.
 " All sub-popset start from popset#set#SubPopSelection, so push s:sel here.
 
-" FUNCTION: popset#set#SubPopSelection(sopt, arg, ...) {{{
+" FUNCTION: popset#set#SubPopSelection(sopt, arg) {{{
 " @param arg: A dictionary same to s:cur format
-function! popset#set#SubPopSelection(sopt, arg, ...)
-    let l:sel = s:unify(a:arg)              " s:cur.idx had been set from s:done
+function! popset#set#SubPopSelection(sopt, arg)
+    let l:sel = s:unify(a:arg, v:true)              " s:cur.idx had been set at s:done
     call s:sel.setTop('idx', s:cur.idx)     " save upper selection's index
     call s:sel.push(l:sel)
 

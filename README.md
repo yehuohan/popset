@@ -38,7 +38,7 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
+"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' for sub-selection
 "       'onCR' : function-name or funcref or lambda
 "   }
 
@@ -74,13 +74,13 @@ endfunction
 
 *`cpl`:* `cpl` is completion for input selection value.
 
-*`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Function is in format 'func(opt, sel, [args])'.
+*`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Function signature is 'func(opt, sel)'.
 
-*`get`:* `get` is a function used to get the value of `opt`. Function is in format 'func(opt)'.
+*`get`:* `get` is a function used to get the value of `opt`. Function signature is 'func(opt)'.
 
-*`sub`:* `sub` is a dictionary used to supply common `cpl`, `cmd`, `get` for sub-selection.
+*`sub`:* `sub` is a dictionary used to supply common `lst`, `dsr`, `cpl`, `cmd`, `get`, `onCR` for sub-selection.
 
-*`onCR`:* `onCR` is a function used to response to key <CR> prior to 'cmd'. Function is in format 'func(opt, [args])'.
+*`onCR`:* `onCR` is a function used to response to key <CR> prior to 'cmd'. Function signature is 'func(opt)'.
 
  - Show all the surpported options of popset:
 
@@ -108,8 +108,7 @@ All the surpported options is according to vim-help-doc.
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get' for sub-selection
-"       'arg' : any type
+"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' for sub-selection
 "       'onCR' : function-name or funcref or lambda
 "   }
 ```
@@ -118,7 +117,7 @@ All the surpported options is according to vim-help-doc.
 
 *`lst`*, *`dic`*, *`dsr`*, *`cpl`*, *`cmd`*, *`get`*, *`sub`*, *`onCR`:* Similar to used in `popset internal data`.
 
-*`arg`:* `arg` is the extra-args passed to `cmd`. If `cmd` doesn't need extra-args, the `dict` must **NOT** contain the `arg` key.
+> Note that `onCR` is also a common response for sub-selection. And it can be override with `onCR` of `sub`.
 
 - A example with sub-selection:
 
