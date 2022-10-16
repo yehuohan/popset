@@ -193,19 +193,18 @@ endfunction
 " FUNCTION: s:createBuffer() {{{
 function! s:createBuffer()
     " get max key text width
-    let l:max = 0
+    let l:maxlst = 0
     for lst in s:cur.lst
         let l:keywid = strwidth(lst)
-        let l:max = (l:keywid > l:max) ? l:keywid : l:max
+        let l:maxlst = (l:keywid > l:maxlst) ? l:keywid : l:maxlst
     endfor
 
-    " fix l:max
+    " fix l:maxlst
+    let l:maxlst += 2
     if s:cur.get != v:null
         let l:val = s:cur.get(s:cur.opt)
-        let l:max += 4
-    else
-        let l:max += 2
     endif
+    let l:needsym = v:false
 
     " create buffer text
     let l:blks = []
@@ -217,6 +216,7 @@ function! s:createBuffer()
         if s:cur.get != v:null && type(get(s:cur.dic, lst, '')) != v:t_dict
             " compare option value only when lst is not a sub-selection
             let l:txt .= ((l:val == lst) ? s:conf.symbols.WIn : ' ') . ' '
+            let l:needsym = v:true
         endif
         " Do NOT use `.=` to avoid some auto string converting error case such
         " as `l:txt .= v:true`
@@ -264,12 +264,16 @@ function! s:createBuffer()
         endif
     endfor
 
+    if l:needsym
+        let l:maxlst += 2
+    endif
+
     " tabular buffer text
     let l:text = []
-    for blk in blks
+    for blk in l:blks
         let l:line = blk[0]
         if len(blk) >= 2
-            let l:line .= repeat(' ', l:max - strwidth(blk[0])) . ' : ' . blk[1]
+            let l:line .= repeat(' ', l:maxlst - strwidth(blk[0])) . ' : ' . blk[1]
         endif
         if len(blk) >= 3
             let l:line .= repeat(' ', l:maxget - strwidth(blk[1])) . ' # ' . blk[2]
