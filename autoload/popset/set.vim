@@ -36,12 +36,14 @@ let s:default = {
     \ }
 let s:cpllst = []     " set s:cpllst before popset#set#FuncLstCompletion for popc#ui#Input
 let s:inited = 0
+let s:showDsr = v:false
 let s:mapsData = [
-    \ ['popset#set#Load'  , ['CR','Space'],      'Execute cmd (Space: preview execution) or onCR'],
-    \ ['popset#set#Input' , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
-    \ ['popset#set#Modify', ['m','M'],           'Modify value of selection on current cursor'],
-    \ ['popset#set#Toggle', ['n','p'],           'Next or Previous value of selection on current cursor'],
-    \ ['popset#set#Back'  , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
+    \ ['popset#set#Load'   , ['CR','Space'],      'Execute cmd (Space: preview execution) or onCR'],
+    \ ['popset#set#Input'  , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
+    \ ['popset#set#Modify' , ['m','M'],           'Modify value of selection on current cursor'],
+    \ ['popset#set#Toggle' , ['n','p'],           'Next or Previous value of selection on current cursor'],
+    \ ['popset#set#ShowDsr', ['d'],               'Show description/values of selection'],
+    \ ['popset#set#Back'   , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
     \ ]
 
 " SECTION: dictionary function {{{1
@@ -258,7 +260,7 @@ function! s:createBuffer()
                 let l:dsr = string(s:cur.dic[lst])
             endif
             if !empty(l:dsr)
-                " show dic discription block
+                " show dic description block
                 call add(l:blks[-1], l:dsr)
             endif
         endif
@@ -275,7 +277,7 @@ function! s:createBuffer()
         if len(blk) >= 2
             let l:line .= repeat(' ', l:maxlst - strwidth(blk[0])) . ' : ' . blk[1]
         endif
-        if len(blk) >= 3
+        if len(blk) >= 3 && s:showDsr
             let l:line .= repeat(' ', l:maxget - strwidth(blk[1])) . ' # ' . blk[2]
         endif
         call add(l:text, l:line)
@@ -415,6 +417,14 @@ function! popset#set#Toggle(key, index)
     else
         call popc#ui#Msg('The selection of current cursor is NOT support modification.')
     endif
+endfunction
+" }}}
+
+" FUNCTION: popset#set#ShowDsr(key, index) {{{
+function! popset#set#ShowDsr(key, index)
+    let s:showDsr = !s:showDsr
+    call s:createBuffer()
+    call s:pop()
 endfunction
 " }}}
 
