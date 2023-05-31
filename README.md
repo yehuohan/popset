@@ -38,8 +38,8 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' for sub-selection
-"       'onCR' : function-name or funcref or lambda
+"       'evt' : function-name or funcref or lambda
+"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
 "   }
 
 let g:Popset_SelectionData = [
@@ -78,9 +78,11 @@ endfunction
 
 *`get`:* `get` is a function used to get the value of `opt`. Function signature is 'func(opt)'.
 
-*`sub`:* `sub` is a dictionary used to supply common `lst`, `dsr`, `cpl`, `cmd`, `get`, `onCR` for sub-selection.
+*`evt`:* `evt` is callable function to reponses to selection events with signature 'func(event_name, ...)'
+> - 'onCR' is key <CR> event invoked with args=`opt` after `cmd`
+> - 'onQuit' is selection quit event
 
-*`onCR`:* `onCR` is a function used to response to key <CR> prior to 'cmd'. Function signature is 'func(opt)'.
+*`sub`:* `sub` is a dictionary used to supply common `lst`, `dsr`, `cpl`, `cmd`, `get`, `evt` for sub-selection.
 
  - Show all the surpported options of popset:
 
@@ -108,16 +110,16 @@ All the surpported options is according to vim-help-doc.
 "       'cpl' : 'completion' used same to input()
 "       'cmd' : function-name or funcref or lambda
 "       'get' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' for sub-selection
-"       'onCR' : function-name or funcref or lambda
+"       'evt' : function-name or funcref or lambda
+"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
 "   }
 ```
 
 *`opt`:* Descriptiong of selection which is **NOT** requeried be different from each other. When it's list, `opt[0]` is used.
 
-*`lst`*, *`dic`*, *`dsr`*, *`cpl`*, *`cmd`*, *`get`*, *`sub`*, *`onCR`:* Similar to used in `popset internal data`.
+*`lst`*, *`dic`*, *`dsr`*, *`cpl`*, *`cmd`*, *`get`*, *`sub`*, *`evt`:* Similar to used in `popset internal data`.
 
-> Note that `onCR` is also a common response for sub-selection. And it can be override with `onCR` of `sub`.
+> Note that `evt` is also a common response for sub-selection. And it can be override with `evt` of `sub`.
 
 - A example with sub-selection:
 

@@ -17,8 +17,10 @@ let s:sel = {
 "   cpl : 'completion' used same to input()
 "   cmd : callable function to execute command with signature 'func(opt, sel)'
 "   get : callable function to get option value with signature 'func(opt)'
-"   sub : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' for sub-selection
-"   onCR : callable function responses to key <CR> prior to 'cmd', with signature 'func(opt)'
+"   evt : callable function to reponses to selection events with signature 'func(event_name, ...)'
+"       - 'onCR'   : key <CR> event invoked with args='opt' after 'cmd'
+"       - 'onQuit' : selection quit event
+"   sub : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
 "   idx : current index of selection
 " }}}
 let s:cur = {}
@@ -30,15 +32,15 @@ let s:default = {
     \ 'cpl' : 'customlist,popset#set#FuncLstCompletion',
     \ 'cmd' : v:null,
     \ 'get' : v:null,
+    \ 'evt' : v:null,
     \ 'sub' : {},
     \ 'idx' : 0,
-    \ 'onCR' : v:null,
     \ }
 let s:cpllst = []     " set s:cpllst before popset#set#FuncLstCompletion for popc#ui#Input
 let s:inited = 0
 let s:showDsr = v:false
 let s:mapsData = [
-    \ ['popset#set#Load'   , ['CR','Space'],      'Execute cmd (Space: preview execution) or onCR'],
+    \ ['popset#set#Load'   , ['CR','Space'],      'Execute cmd (Space: preview execution) or evt.onCR'],
     \ ['popset#set#Input'  , ['i','I', 'e', 'E'], 'Input or Edit value of current selection '],
     \ ['popset#set#Modify' , ['m','M'],           'Modify value of selection on current cursor'],
     \ ['popset#set#Toggle' , ['n','p'],           'Next or Previous value of selection on current cursor'],
@@ -98,7 +100,10 @@ endfunction
 function! popset#set#Init()
     let s:lyr = s:popc.addLayer('Popset', {
                 \ 'bindCom' : 0,
-                \ 'fnPop' : function('popset#set#PopSet', ['popset']),
+                \ 'fnPop'   : function('popset#set#PopSet', ['popset']),
+                \ 'events'  : {
+                    \ 'onQuit' : function('popset#set#OnQuit'),
+                    \ },
                 \ })
     call popc#utils#Log('popset', 'popset layer was enabled')
 
@@ -106,6 +111,14 @@ function! popset#set#Init()
         call s:lyr.addMaps(md[0], md[1], md[2])
     endfor
     unlet! s:mapsData
+endfunction
+" }}}
+
+" FUNCTION: popset#set#OnQuit() {{{
+function! popset#set#OnQuit()
+    if s:cur.evt != v:null
+        call s:cur.evt('onQuit', s:cur.opt)
+    endif
 endfunction
 " }}}
 
@@ -146,7 +159,7 @@ endfunction
 " @param full: get a full sub-selection entry or not
 function! s:unify(arg, full, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
-    " 'lst', 'dsr', 'cpl', 'cmd', 'get', 'onCR' can be from s:cur.sub
+    " 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' can be from s:cur.sub
     " 'opt' can be from s:cur.lst[s:cur.idx]
     let l:sel = {
         \ 'dic' : {},
@@ -182,10 +195,10 @@ function! s:unify(arg, full, ...)
     let l:sel.get = has_key(l:sel, 'get') ? s:callable(l:sel.get)
         \ : s:callable(get(s:cur.sub, 'get', v:null))
     if a:full
-        " check onCR
-        let l:sel.onCR = has_key(l:sel, 'onCR') ? s:callable(l:sel.onCR)
-            \ : has_key(s:cur.sub, 'onCR') ? s:callable(s:cur.sub.onCR)
-            \ : s:callable(get(s:cur, 'onCR', v:null))
+        " check evt
+        let l:sel.evt = has_key(l:sel, 'evt') ? s:callable(l:sel.evt)
+            \ : has_key(s:cur.sub, 'evt') ? s:callable(s:cur.sub.evt)
+            \ : s:callable(get(s:cur, 'evt', v:null))
     endif
 
     return l:sel
@@ -344,9 +357,9 @@ endfunction
 
 " FUNCTION: popset#set#Load(key, index) {{{
 function! popset#set#Load(key, index)
-    if a:key ==# 'CR' && s:cur.onCR != v:null
+    if a:key ==# 'CR' && s:cur.evt != v:null
         call s:done(a:index, v:null, v:false, v:false)
-        call s:cur.onCR(s:cur.opt)
+        call s:cur.evt('onCR', s:cur.opt)
     else
         call s:done(a:index, v:null, a:key ==# 'Space', v:true)
     endif
