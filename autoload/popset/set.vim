@@ -99,8 +99,8 @@ endfunction
 " FUNCTION: popset#set#Init() {{{
 function! popset#set#Init()
     let s:lyr = s:popc.addLayer('Popset', {
-                \ 'bindCom' : 0,
-                \ 'fnPop'   : function('popset#set#PopSet', ['popset']),
+                \ 'func' : 'popset#set#PopSet',
+                \ 'args' : ['popset'],
                 \ 'events'  : {
                     \ 'onQuit' : function('popset#set#OnQuit'),
                     \ },
@@ -296,7 +296,7 @@ function! s:createBuffer()
         call add(l:text, l:line)
     endfor
 
-    call s:lyr.setBufs(v:t_list, l:text)
+    call s:lyr.setBufs(l:text)
 endfunction
 " }}}
 
