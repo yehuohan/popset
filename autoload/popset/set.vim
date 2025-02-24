@@ -30,6 +30,7 @@ let s:sel = {
 "   - 'onQuit' : called after quit pop selection
 " sub : dict<string-lst|dst|cpl|cmd|get|evt>|fun(opt):dict<string-lst|dst|cpl|cmd|get|evt>
 "       shared 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
+" bot : is bottom selection or not (means no sub-selection)
 " idx : current index of selection
 " }}}
 let s:cur = {}
@@ -43,6 +44,7 @@ let s:default = {
     \ 'get' : v:null,
     \ 'evt' : v:null,
     \ 'sub' : {},
+    \ 'bot' : v:false,
     \ 'idx' : 0,
     \ }
 let s:cpllst = []     " set s:cpllst before popset#set#FuncLstCompletion for popc#ui#Input
@@ -176,7 +178,7 @@ function! s:unify(arg, root, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
     " 'opt' can be from s:cur.lst[s:cur.idx]
     " 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' can be from s:cur.sub
-    let l:sel = { 'dic' : {}, 'sub' : {}, 'idx' : 0 }
+    let l:sel = { 'dic' : {}, 'sub' : {}, 'bot' : v:false, 'idx' : 0 }
     call extend(l:sel, l:arg, 'force')
 
     " check opt
@@ -197,6 +199,13 @@ function! s:unify(arg, root, ...)
 
     " check dic
     let l:sel.dic = s:try_call(l:sel.dic, l:sel.opt)
+    let l:cnt = 0
+    for val in values(l:sel.dic)
+        if type(val) != v:t_dict
+            let l:cnt += 1
+        endif
+    endfor
+    let l:sel.bot = l:cnt == len(l:sel.dic)
 
     " check dsr
     if !has_key(l:sel, 'dsr')
@@ -418,6 +427,10 @@ function! popset#set#Modify(key, index)
     " only sub-selection can be modified
     if has_key(s:cur.dic, l:item) && type(s:cur.dic[l:item]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[l:item], v:false)
+        if !l:ss.bot
+            call popc#ui#Msg('The current is a sub-selection and can''t be modified')
+            return
+        endif
         let s:cpllst = l:ss.lst
         let l:text = ''
         if a:key ==# 'M' && l:ss.get != v:null
@@ -434,7 +447,7 @@ function! popset#set#Modify(key, index)
             call popc#ui#Create(s:lyr.name)
         endif
     else
-        call popc#ui#Msg('The selection of current cursor is NOT support modification.')
+        call popc#ui#Msg('The current selection value can''t be modified')
     endif
 endfunction
 " }}}
@@ -446,6 +459,10 @@ function! popset#set#Toggle(key, index)
     " only sub-selection can be modified
     if has_key(s:cur.dic, l:item) && type(s:cur.dic[l:item]) == v:t_dict
         let l:ss = s:unify(s:cur.dic[l:item], v:false)
+        if !l:ss.bot
+            call popc#ui#Msg('The current is a sub-selection and can''t be modified')
+            return
+        endif
         let l:text = ''
         if l:ss.get != v:null
             call popc#ui#Toggle(0)
@@ -463,7 +480,7 @@ function! popset#set#Toggle(key, index)
             call popc#ui#Create(s:lyr.name)
         endif
     else
-        call popc#ui#Msg('The selection of current cursor is NOT support modification.')
+        call popc#ui#Msg('The current selection value can''t be modified')
     endif
 endfunction
 " }}}
