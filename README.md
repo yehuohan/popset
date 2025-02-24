@@ -31,15 +31,26 @@ There is only one command `PopSet`, which is similar to `set` command, in popset
 
 ```vim
 "   {
-"       'opt' : string-list
-"       'lst' : string-list
-"       'dic' : string-dict or sub-dict
-"       'dsr' : string or funcref or lambda
-"       'cpl' : 'completion' used same to input()
-"       'cmd' : function-name or funcref or lambda
-"       'get' : function-name or funcref or lambda
-"       'evt' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
+"       opt : string|string[]|fun():string|fun():string[]
+"             option name of selection
+"       lst : string[]|fun(opt):string[]
+"             the items to select
+"       dic : dict<string-string>|dict<string-dict>|fun(opt):dict<string-string>|fun(opt):dict<string-dict>
+"             description or sub-selection of 'lst' item
+"       dsr : string|fun(opt):string
+"             description for 'opt'
+"       cpl : string|fun(opt):string
+"             'completion' used same to input()
+"       cmd : fun(opt, sel)
+"             used to execute with the selected item from 'lst'
+"       get : fun(opt)
+"             used to get the 'opt' value
+"       evt : fun(event:string, opt)
+"             used to reponses to selection events
+"         - 'onCR'   : called when <CR> is pressed (will be called after 'cmd' is executed)
+"         - 'onQuit' : called after quit pop selection
+"       sub : dict<string-lst|dst|cpl|cmd|get|evt>|fun(opt):dict<string-lst|dst|cpl|cmd|get|evt>
+"             shared 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
 "   }
 
 let g:Popset_SelectionData = [
@@ -64,25 +75,9 @@ function! GetValue(sopt)
 endfunction
 ```
 
-*`opt`:* `opt` is the option name list. `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will take two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset would only append the `lst` and `dic` but not override the existed one.
-
-*`lst`:* `lst` is the selection list of the `opt`.
-
-*`dic`:* `dic` is a description or sub-selection, who's key is from `lst`.
-
-*`dsr`:* `dsr` is the description of `opt`. If its type is funcref or lambda, it must return a string of description. Function is in format 'func(opt)'.
-
-*`cpl`:* `cpl` is completion for input selection value.
+*`opt`:* `opt[0]` should be fullname of the option, and `opt[1:-1]` can be the shortname for opt[0] if existed. Popset will take two options as the same option when "opt[0]" is equal. If the `opt` your add had been existed in popset, popset would only append the `lst` and `dic` but not override the existed one.
 
 *`cmd`:* `cmd` is a callback which execute with args of `opt` and the selected item of `lst`. In the example code, the `SetEqual` will function as `set filtype=cpp` if you choose the selenction `cpp` from `lst`. Function signature is 'func(opt, sel)'.
-
-*`get`:* `get` is a function used to get the value of `opt`. Function signature is 'func(opt)'.
-
-*`evt`:* `evt` is callable function to reponses to selection events with signature 'func(event_name, ...)'
-> - 'onCR' is key <CR> event invoked with args=`opt` after `cmd`
-> - 'onQuit' is selection quit event
-
-*`sub`:* `sub` is a dictionary used to supply common `lst`, `dsr`, `cpl`, `cmd`, `get`, `evt` for sub-selection.
 
  - Show all the surpported options of popset:
 
@@ -97,23 +92,7 @@ All the surpported options is according to vim-help-doc.
 
 <h3 id="4.1">PopSelection</h3>
 
-`PopSelection(dict)` is used to pop selections with given `dict`. The `dict` is similar to g:Popset_SelectionData, but **NOT** belong to `popset internal data`.
-
-`dict` must be in the format:
-
-```vim
-"   {
-"       'opt' : string-list or string
-"       'lst' : string-list
-"       'dic' : string-dict or sub-dict
-"       'dsr' : string or funcref or lambda
-"       'cpl' : 'completion' used same to input()
-"       'cmd' : function-name or funcref or lambda
-"       'get' : function-name or funcref or lambda
-"       'evt' : function-name or funcref or lambda
-"       'sub' : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
-"   }
-```
+`PopSelection(dict)` is used to pop selections with given `dict`. The `dict` is similar to `g:Popset_SelectionData`, but **NOT** belong to `popset internal data`.
 
 *`opt`:* Descriptiong of selection which is **NOT** requeried be different from each other. When it's list, `opt[0]` is used.
 

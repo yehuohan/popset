@@ -10,18 +10,27 @@ let s:sel = {
     \ 'top' : -1,
     \ }
 " {{{ s:cur format
-"   opt : string-list or string, option name of selection
-"   lst : string-list, list of selection
-"   dic : string-dict or sub-dict, dictionary of description or sub-selection
-"   dsr : string or funcref or lambda, description for opt, with format 'func(opt)'
-"   cpl : 'completion' used same to input()
-"   cmd : callable function to execute command with signature 'func(opt, sel)'
-"   get : callable function to get option value with signature 'func(opt)'
-"   evt : callable function to reponses to selection events with signature 'func(event_name, ...)'
-"       - 'onCR'   : key <CR> event invoked with args='opt' after 'cmd'
-"       - 'onQuit' : selection quit event
-"   sub : common dictionary of 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
-"   idx : current index of selection
+" opt : string|string[]|fun():string|fun():string[]
+"       option name of selection
+" lst : string[]|fun(opt):string[]
+"       the items to select
+" dic : dict<string-string>|dict<string-dict>|fun(opt):dict<string-string>|fun(opt):dict<string-dict>
+"       description or sub-selection of 'lst' item
+" dsr : string|fun(opt):string
+"       description for 'opt'
+" cpl : string|fun(opt):string
+"       'completion' used same to input()
+" cmd : fun(opt, sel)
+"       used to execute with the selected item from 'lst'
+" get : fun(opt)
+"       used to get the 'opt' value
+" evt : fun(event:string, opt)
+"       used to reponses to selection events
+"   - 'onCR'   : called when <CR> is pressed (will be called after 'cmd' is executed)
+"   - 'onQuit' : called after quit pop selection
+" sub : dict<string-lst|dst|cpl|cmd|get|evt>|fun(opt):dict<string-lst|dst|cpl|cmd|get|evt>
+"       shared 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' for sub-selection
+" idx : current index of selection
 " }}}
 let s:cur = {}
 let s:default = {
@@ -45,7 +54,7 @@ let s:mapsData = [
     \ ['popset#set#Modify' , ['m','M'],           'Modify value of selection on current cursor'],
     \ ['popset#set#Toggle' , ['n','p'],           'Next or Previous value of selection on current cursor'],
     \ ['popset#set#ShowDsr', ['d'],               'Show description/values of selection'],
-    \ ['popset#set#Back'   , ['u','U'],           'Back to upper selection (U: back to the root-upper selection)'],
+    \ ['popset#set#Back'   , ['u','U'],           'Back to upper selection (U: back to the root upper selection)'],
     \ ]
 
 " SECTION: dictionary function {{{1
@@ -151,55 +160,78 @@ function! s:callable(item)
 endfunction
 " }}}
 
+" FUNCTION: s:try_call(item) {{{
+" try call item if item is callable
+function! s:try_call(item, ...)
+    return type(a:item) == v:t_func ? call(a:item, a:000) : a:item
+endfunction
+" }}}
+
 " FUNCTION: s:unify(arg, ...) {{{
-" get unified sub-selection entry which is called l:sel in function.
-" as for sub-selection, s:cur is called upper selection。
+" get unified sub-selection (called l:sel, and s:cur is called upper-selection).
 " before call s:unify, must have s:cur.idx set, or provide @param a:1 as l:sel.opt.
 " @param arg: original sub-selection entry
-" @param full: get a full sub-selection entry or not
-function! s:unify(arg, full, ...)
+" @param root: is a root selection or not
+function! s:unify(arg, root, ...)
     let l:arg = (type(a:arg) == v:t_dict) ? a:arg : {}
-    " 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' can be from s:cur.sub
     " 'opt' can be from s:cur.lst[s:cur.idx]
-    let l:sel = {
-        \ 'dic' : {},
-        \ 'sub' : {},
-        \ 'idx' : 0,
-        \ }
+    " 'lst', 'dsr', 'cpl', 'cmd', 'get', 'evt' can be from s:cur.sub
+    let l:sel = { 'dic' : {}, 'sub' : {}, 'idx' : 0 }
     call extend(l:sel, l:arg, 'force')
+
     " check opt
-    if has_key(l:sel, 'opt')
-        if type(l:sel.opt) == v:t_list
-            let l:sel.opt = empty(l:sel.opt) ? '' : l:sel.opt[0]
-        endif
-    else
-        " the upper selection must has 'lst'
+    if !has_key(l:sel, 'opt')
+        " the upper-selection must has 'lst'
         let l:sel.opt = (a:0 >= 1) ? a:1 : s:cur.lst[s:cur.idx]
     endif
-    "check lst
+    let l:sel.opt = s:try_call(l:sel.opt)
+    if type(l:sel.opt) == v:t_list
+        let l:sel.opt = empty(l:sel.opt) ? '' : l:sel.opt[0]
+    endif
+
+    " check lst
     if !has_key(l:sel, 'lst')
         let l:sel.lst = get(s:cur.sub, 'lst', [])
     endif
+    let l:sel.lst = s:try_call(l:sel.lst, l:sel.opt)
+
+    " check dic
+    let l:sel.dic = s:try_call(l:sel.dic, l:sel.opt)
+
     " check dsr
     if !has_key(l:sel, 'dsr')
         let l:sel.dsr = get(s:cur.sub, 'dsr', v:null)
     endif
+    let l:sel.dsr = s:try_call(l:sel.dsr, l:sel.opt)
+
     " check cpl
     if !has_key(l:sel, 'cpl')
         let l:sel.cpl = get(s:cur.sub, 'cpl', 'customlist,popset#set#FuncLstCompletion')
     endif
+    let l:sel.cpl = s:try_call(l:sel.cpl, l:sel.opt)
+
     " check cmd
-    let l:sel.cmd = has_key(l:sel, 'cmd') ? s:callable(l:sel.cmd)
-        \ : s:callable(get(s:cur.sub, 'cmd', 's:funcCmd'))
+    let l:sel.cmd = has_key(l:sel, 'cmd')
+                \ ? s:callable(l:sel.cmd)
+                \ : s:callable(get(s:cur.sub, 'cmd', 's:funcCmd'))
+
     " check get
-    let l:sel.get = has_key(l:sel, 'get') ? s:callable(l:sel.get)
-        \ : s:callable(get(s:cur.sub, 'get', v:null))
-    if a:full
-        " check evt
-        let l:sel.evt = has_key(l:sel, 'evt') ? s:callable(l:sel.evt)
-            \ : has_key(s:cur.sub, 'evt') ? s:callable(s:cur.sub.evt)
-            \ : s:callable(get(s:cur, 'evt', v:null))
+    let l:sel.get = has_key(l:sel, 'get')
+                \ ? s:callable(l:sel.get)
+                \ : s:callable(get(s:cur.sub, 'get', v:null))
+
+    " check evt
+    if a:root
+        " only evt is shared recursive
+        let l:sel.evt = has_key(l:sel, 'evt')
+                    \ ? s:callable(l:sel.evt)
+                    \ : has_key(s:cur.sub, 'evt')
+                    \       ? s:callable(s:cur.sub.evt)
+                    \       : s:callable(get(s:cur, 'evt', v:null))
     endif
+
+    " check sub
+    let l:sel.sub = s:try_call(l:sel.sub, l:sel.opt)
 
     return l:sel
 endfunction
@@ -209,8 +241,8 @@ endfunction
 function! s:createBuffer()
     " get max key text width
     let l:maxlst = 0
-    for lst in s:cur.lst
-        let l:keywid = strwidth(lst)
+    for item in s:cur.lst
+        let l:keywid = strwidth(item)
         let l:maxlst = (l:keywid > l:maxlst) ? l:keywid : l:maxlst
     endfor
 
@@ -224,33 +256,33 @@ function! s:createBuffer()
     " create buffer text
     let l:blks = []
     let l:maxget = 0
-    for lst in s:cur.lst
+    for item in s:cur.lst
         call add(l:blks, [])
-        " show lst block
+        " show item block
         let l:txt = '  '
-        if s:cur.get != v:null && type(get(s:cur.dic, lst, '')) != v:t_dict
-            " compare option value only when lst is not a sub-selection
-            let l:txt .= ((l:val ==# lst) ? s:conf.symbols.CWin : ' ') . ' '
+        if s:cur.get != v:null && type(get(s:cur.dic, item, '')) != v:t_dict
+            " compare option value only when item is not a sub-selection
+            let l:txt .= ((l:val ==# item) ? s:conf.symbols.CWin : ' ') . ' '
             let l:needsym = v:true
         endif
         " Do NOT use `.=` to avoid some auto string converting error case such
         " as `l:txt .= v:true`
-        let l:txt = l:txt . lst
+        let l:txt = l:txt . item
         call add(l:blks[-1], l:txt)
 
         " show dic block
-        if has_key(s:cur.dic, lst)
+        if has_key(s:cur.dic, item)
             let l:dsr = ''
-            if type(s:cur.dic[lst]) == v:t_dict
+            if type(s:cur.dic[item]) == v:t_dict
                 " use value of sub-selection from 'get'
-                let l:ss = s:unify(s:cur.dic[lst], v:false, lst)
+                let l:ss = s:unify(s:cur.dic[item], v:false, item)
                 if l:ss.get != v:null
                     let l:val = l:ss.get(l:ss.opt)
                     " dict and list is not well show as value block
                     if type(l:val) != v:t_dict && type(l:val) != v:t_list
                         let l:wid = strwidth(l:val)
                         let l:maxget = (l:wid > l:maxget) ? l:wid : l:maxget
-                        " show dic value block
+                        " show 'dic' value block
                         call add(l:blks[-1], l:val)
                     endif
                 endif
@@ -265,12 +297,12 @@ function! s:createBuffer()
                 else
                     let l:dsr .= string(l:ss.lst)
                 endif
-            elseif type(s:cur.dic[lst]) == v:t_string
-                " use string-value of dic
-                let l:dsr = s:cur.dic[lst]
+            elseif type(s:cur.dic[item]) == v:t_string
+                " use string-value of 'dic'
+                let l:dsr = s:cur.dic[item]
             else
-                " convert value of dic to string
-                let l:dsr = string(s:cur.dic[lst])
+                " convert value of 'dic' to string
+                let l:dsr = string(s:cur.dic[item])
             endif
             if !empty(l:dsr)
                 " show dic description block
@@ -318,7 +350,7 @@ function! s:done(index, input, keep, ensub)
     if empty(s:cur.lst) && a:input == v:null
         return
     endif
-    let s:cur.idx = a:index                 " save upper selection's index
+    let s:cur.idx = a:index                 " save upper-selection's index
     if !empty(s:cur.lst)
         let l:item = get(s:cur.dic, s:cur.lst[s:cur.idx], v:null)
     endif
@@ -368,8 +400,9 @@ endfunction
 
 " FUNCTION: popset#set#Input(key, index) {{{
 function! popset#set#Input(key, index)
+    let l:item = s:cur.lst[a:index]
     let s:cpllst = s:cur.lst
-    let l:text = (empty(s:cur.lst) || a:key ==? 'i') ? '' : s:cur.lst[a:index]
+    let l:text = (empty(s:cur.lst) || a:key ==? 'i') ? '' : l:item
     let l:prompt = (a:key ==? 'i') ? 'Input: ' : 'Edit: '
     let l:val = popc#ui#Input(l:prompt, l:text, s:cur.cpl)
     if l:val != v:null
@@ -380,10 +413,11 @@ endfunction
 
 " FUNCTION: popset#set#Modify(key, index) {{{
 function! popset#set#Modify(key, index)
-    let s:cur.idx = a:index                 " save upper selection's index
+    let s:cur.idx = a:index                 " save upper-selection's index
+    let l:item = s:cur.lst[a:index]
     " only sub-selection can be modified
-    if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
-        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]], v:false)
+    if has_key(s:cur.dic, l:item) && type(s:cur.dic[l:item]) == v:t_dict
+        let l:ss = s:unify(s:cur.dic[l:item], v:false)
         let s:cpllst = l:ss.lst
         let l:text = ''
         if a:key ==# 'M' && l:ss.get != v:null
@@ -407,10 +441,11 @@ endfunction
 
 " FUNCTION: popset#set#Toggle(key, index) {{{
 function! popset#set#Toggle(key, index)
-    let s:cur.idx = a:index                 " save upper selection's index
+    let s:cur.idx = a:index                 " save upper-selection's index
+    let l:item = s:cur.lst[a:index]
     " only sub-selection can be modified
-    if has_key(s:cur.dic, s:cur.lst[a:index]) && type(s:cur.dic[s:cur.lst[a:index]]) == v:t_dict
-        let l:ss = s:unify(s:cur.dic[s:cur.lst[a:index]], v:false)
+    if has_key(s:cur.dic, l:item) && type(s:cur.dic[l:item]) == v:t_dict
+        let l:ss = s:unify(s:cur.dic[l:item], v:false)
         let l:text = ''
         if l:ss.get != v:null
             call popc#ui#Toggle(0)
@@ -465,8 +500,8 @@ endfunction
 " FUNCTION: popset#set#SubPopSelection(sopt, arg) {{{
 " @param arg: A dictionary same to s:cur format
 function! popset#set#SubPopSelection(sopt, arg)
-    let l:sel = s:unify(a:arg, v:true)              " s:cur.idx had been set at s:done
-    call s:sel.setTop('idx', s:cur.idx)     " save upper selection's index
+    let l:sel = s:unify(a:arg, v:true)      " s:cur.idx had been set at s:done
+    call s:sel.setTop('idx', s:cur.idx)     " save upper-selection's index
     call s:sel.push(l:sel)
 
     let s:cur = l:sel

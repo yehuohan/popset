@@ -92,7 +92,7 @@ similar to g:Popset_SelectionData, but belong to popset external data.
 The dict must be in the format: >
 
     let l:dict = {
-        \ 'opt' : <list or string>,
+        \ 'opt' : string[] or string,
         \ 'dsr' : '',
         \ 'lst' : [],
         \ 'dic' : {},
