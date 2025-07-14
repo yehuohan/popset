@@ -24,7 +24,7 @@ Plug 'yehuohan/popset'
 There is only one command `PopSet`, which is similar to `set` command, in popset. What can be set by `PopSet` is all in `popset internal data`.
 
 <div align="center">
-<img alt="Popset" src="popset.gif"  width=75% height=75% />
+<img alt="Popset" src="popset.gif" style="width:75%; height:auto;" />
 </div>
 
  - Add selections to `g:Popset_SelectionData` as `popset internal data`:
@@ -128,7 +128,7 @@ call PopSelection(s:menu)
 - A example of selection for setttings from [use.vim](https://github.com/yehuohan/dotconfigs/blob/master/vim/.vim/viml/use.vim):
 
 <div align="center">
-<img alt="use" src="use.gif"  width=75% height=75% />
+<img alt="use" src="use.gif" style="width:75%; height:auto;" />
 </div>
 
 ---
